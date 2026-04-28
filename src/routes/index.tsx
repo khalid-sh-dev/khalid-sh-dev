@@ -409,7 +409,88 @@ function Testimonials() {
   );
 }
 
-const contactSchema = z.object({
+function FAQ() {
+  const items = [
+    {
+      q: "كم تستغرق عملية بناء نظام أتمتة مخصص؟",
+      a: "تختلف المدة حسب التعقيد، لكن أغلب المشاريع تكتمل خلال 2 إلى 6 أسابيع، بعد جلسة تحليل أولية لتحديد العمليات والتكاملات المطلوبة.",
+    },
+    {
+      q: "هل تدعمون السوق السعودي تحديداً في الحملات الإعلانية؟",
+      a: "نعم، تخصصي الأساسي هو حملات Snapchat و TikTok للسوق السعودي، مع فهم عميق لسلوك المستخدم وأفضل أوقات النشر والمحتوى المناسب ثقافياً.",
+    },
+    {
+      q: "ما الأدوات التي تستخدمها في الأتمتة؟",
+      a: "أعتمد على Make و Zapier و n8n للأتمتة المرنة، مع كتابة سكريبتات مخصصة عند الحاجة، وربط APIs مباشرة لضمان الأداء والاستقرار.",
+    },
+    {
+      q: "هل أحصل على تقارير دورية عن أداء الحملات؟",
+      a: "بالتأكيد، يصلك تقرير أسبوعي مفصّل وآخر شهري مع توصيات تحسين، بالإضافة إلى لوحة Looker Studio حية يمكنك متابعتها في أي وقت.",
+    },
+    {
+      q: "هل تقدمون دعماً بعد تسليم المشروع؟",
+      a: "نعم، كل مشروع يتضمن فترة دعم مجانية لمدة 30 يوماً، مع إمكانية الاشتراك في باقات الصيانة والتطوير المستمر.",
+    },
+    {
+      q: "كيف تتم عملية الدفع وما هي الأسعار؟",
+      a: "السعر يعتمد على نطاق المشروع، ويتم الاتفاق على دفعة مقدمة وأخرى عند التسليم. تواصل معي للحصول على عرض سعر مخصص لمشروعك.",
+    },
+  ];
+  const [open, setOpen] = useState<number | null>(0);
+  return (
+    <section id="faq" className="relative py-24 scroll-mt-24">
+      <div className="mx-auto max-w-4xl px-4 sm:px-6">
+        <motion.div initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeUp} className="text-center">
+          <span className="text-primary text-sm font-bold">_ الأسئلة الشائعة</span>
+          <h2 className="font-display text-3xl sm:text-5xl mt-3">
+            استفسارات <span className="text-gradient-cyan">متكررة</span>
+          </h2>
+          <p className="mt-4 text-muted-foreground">إجابات مباشرة على أكثر ما يسأله العملاء قبل البدء.</p>
+        </motion.div>
+
+        <div className="mt-12 space-y-3">
+          {items.map((it, i) => {
+            const isOpen = open === i;
+            return (
+              <motion.div
+                key={it.q}
+                initial="hidden" whileInView="show" viewport={{ once: true }}
+                variants={fadeUp} transition={{ delay: i * 0.05 }}
+                className={`glass rounded-2xl overflow-hidden transition ${isOpen ? "border-primary/40" : ""}`}
+              >
+                <button
+                  onClick={() => setOpen(isOpen ? null : i)}
+                  className="w-full flex items-center justify-between gap-4 p-5 text-right hover:bg-card/30 transition"
+                  aria-expanded={isOpen}
+                >
+                  <span className="font-bold text-base sm:text-lg flex-1">{it.q}</span>
+                  <ChevronDown className={`h-5 w-5 text-primary shrink-0 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} />
+                </button>
+                <AnimatePresence initial={false}>
+                  {isOpen && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                      className="overflow-hidden"
+                    >
+                      <div className="px-5 pb-5 text-muted-foreground leading-relaxed text-sm sm:text-base border-t border-border/50 pt-4">
+                        {it.a}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+
   name: z.string().trim()
     .min(2, { message: "الاسم يجب أن يكون حرفين على الأقل" })
     .max(80, { message: "الاسم طويل جداً" }),
