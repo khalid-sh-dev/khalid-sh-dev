@@ -490,7 +490,7 @@ function FAQ() {
   );
 }
 
-
+const contactSchema = z.object({
   name: z.string().trim()
     .min(2, { message: "الاسم يجب أن يكون حرفين على الأقل" })
     .max(80, { message: "الاسم طويل جداً" }),
