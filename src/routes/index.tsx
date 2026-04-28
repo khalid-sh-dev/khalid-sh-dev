@@ -1,28 +1,66 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft, Mail, Sparkles, Bot, BarChart3,
   Megaphone, Workflow, LineChart, Package, FileSpreadsheet,
   ShoppingCart, MapPin, Briefcase, Send, MessageCircle, Phone,
-  Star, Quote, CheckCircle2, AlertCircle,
+  Star, Quote, CheckCircle2, AlertCircle, ChevronDown, TrendingUp, RotateCcw,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import portrait from "@/assets/khalid-portrait.png";
 import dashboard from "@/assets/dashboard-mockup.jpg";
 
+const PAGE_TITLE = "المهندس خالد الشريف — أتمتة التسويق والنمو";
+const PAGE_DESC = "متخصص في بناء أنظمة الأتمتة وإدارة الحملات الإعلانية الذكية للسوق السعودي. ندمج التقنية بالتسويق لأتمتة نمو أعمالكم.";
+
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "المهندس خالد الشريف — أتمتة التسويق والنمو" },
-      { name: "description", content: "متخصص في بناء أنظمة الأتمتة وإدارة الحملات الإعلانية الذكية للسوق السعودي. ندمج التقنية بالتسويق لأتمتة نمو أعمالكم." },
-      { property: "og:title", content: "المهندس خالد الشريف — أتمتة التسويق والنمو" },
-      { property: "og:description", content: "بناء أنظمة SaaS وأتمتة العمليات وإدارة حملات Snapchat & TikTok للسوق السعودي." },
+      { title: PAGE_TITLE },
+      { name: "description", content: PAGE_DESC },
+      { property: "og:title", content: PAGE_TITLE },
+      { property: "og:description", content: PAGE_DESC },
+      { property: "og:url", content: "/" },
+      { name: "twitter:title", content: PAGE_TITLE },
+      { name: "twitter:description", content: PAGE_DESC },
       { name: "theme-color", content: "#0b1426" },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Person",
+          name: "المهندس خالد الشريف",
+          jobTitle: "متخصص أتمتة التسويق والنمو",
+          email: "khalid.sh.dev@gmail.com",
+          description: PAGE_DESC,
+          knowsAbout: ["Marketing Automation", "SaaS", "Snapchat Ads", "TikTok Ads", "Data Analytics"],
+          areaServed: "SA",
+        }),
+      },
     ],
   }),
   component: Index,
 });
+
+declare global {
+  interface Window {
+    gtag?: (...args: unknown[]) => void;
+  }
+}
+
+const SUBMIT_COUNT_KEY = "contact_submissions_count";
+function getSubmissionCount(): number {
+  if (typeof window === "undefined") return 0;
+  return parseInt(localStorage.getItem(SUBMIT_COUNT_KEY) || "0", 10) || 0;
+}
+function incrementSubmissionCount(): number {
+  const next = getSubmissionCount() + 1;
+  localStorage.setItem(SUBMIT_COUNT_KEY, String(next));
+  return next;
+}
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
