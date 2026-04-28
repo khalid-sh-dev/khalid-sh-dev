@@ -752,6 +752,7 @@ function Index() {
         <Product />
         <Services />
         <Testimonials />
+        <FAQ />
         <Contact />
       </main>
       <Footer />
