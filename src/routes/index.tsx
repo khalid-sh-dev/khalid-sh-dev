@@ -423,12 +423,71 @@ const contactSchema = z.object({
     .max(1000, { message: "الرسالة طويلة جداً" }),
 });
 
-type FormErrors = Partial<Record<keyof z.infer<typeof contactSchema>, string>>;
+type ContactData = z.infer<typeof contactSchema>;
+
+function maskEmail(email: string): string {
+  const [user, domain] = email.split("@");
+  if (!user || !domain) return "***";
+  const head = user.slice(0, 2);
+  const tail = user.length > 3 ? user.slice(-1) : "";
+  return `${head}${"•".repeat(Math.max(2, user.length - 3))}${tail}@${domain}`;
+}
+
+function ConfirmationView({ data, count, onReset }: { data: ContactData; count: number; onReset: () => void }) {
+  const ticket = `KS-${Date.now().toString(36).toUpperCase().slice(-6)}`;
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      className="glass-strong rounded-3xl p-7 sm:p-9 text-center"
+    >
+      <div className="mx-auto h-16 w-16 rounded-full bg-emerald-500/15 border border-emerald-500/40 grid place-items-center glow-cyan">
+        <CheckCircle2 className="h-8 w-8 text-emerald-400" />
+      </div>
+      <h3 className="mt-6 font-display text-2xl sm:text-3xl">شكراً {data.name.split(" ")[0]}، استلمنا طلبك ✨</h3>
+      <p className="mt-3 text-muted-foreground leading-relaxed max-w-md mx-auto">
+        سأراجع طلبك وأرد عليك خلال 24 ساعة. تم تسجيل الطلب بنجاح في نظامنا.
+      </p>
+
+      <div className="mt-7 grid sm:grid-cols-3 gap-3 text-right">
+        <div className="glass rounded-xl p-4">
+          <div className="text-xs text-muted-foreground">رقم المرجع</div>
+          <div className="font-bold mt-1 font-mono text-primary" dir="ltr">{ticket}</div>
+        </div>
+        <div className="glass rounded-xl p-4">
+          <div className="text-xs text-muted-foreground">نوع الخدمة</div>
+          <div className="font-bold mt-1 text-sm">{data.service}</div>
+        </div>
+        <div className="glass rounded-xl p-4">
+          <div className="text-xs text-muted-foreground">البريد للتواصل</div>
+          <div className="font-bold mt-1 text-sm" dir="ltr">{maskEmail(data.email)}</div>
+        </div>
+      </div>
+
+      <div className="mt-6 inline-flex items-center gap-2 text-xs text-muted-foreground glass rounded-full px-4 py-2">
+        <TrendingUp className="h-3.5 w-3.5 text-primary" />
+        إجمالي الطلبات المُستلمة عبر الموقع: <span className="font-bold text-primary">{count}</span>
+      </div>
+
+      <div className="mt-7 flex flex-wrap justify-center gap-3">
+        <a href="mailto:khalid.sh.dev@gmail.com" className="inline-flex items-center gap-2 rounded-xl bg-[image:var(--gradient-cyan)] text-background px-5 py-3 font-bold glow-cyan hover:scale-[1.02] transition">
+          <Mail className="h-4 w-4" /> فتح البريد مباشرة
+        </a>
+        <button onClick={onReset} className="inline-flex items-center gap-2 rounded-xl glass-strong px-5 py-3 font-bold hover:border-primary/40 transition">
+          <RotateCcw className="h-4 w-4" /> إرسال طلب جديد
+        </button>
+      </div>
+    </motion.div>
+  );
+}
 
 function Contact() {
-  const [sent, setSent] = useState(false);
+  const [confirmed, setConfirmed] = useState<ContactData | null>(null);
+  const [count, setCount] = useState(0);
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => { setCount(getSubmissionCount()); }, []);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -452,10 +511,22 @@ function Contact() {
     setErrors({});
     setSubmitting(true);
     setTimeout(() => {
+      const newCount = incrementSubmissionCount();
+      // Google Analytics conversion event
+      if (typeof window !== "undefined" && typeof window.gtag === "function") {
+        window.gtag("event", "generate_lead", {
+          event_category: "contact",
+          event_label: result.data.service,
+          value: 1,
+        });
+        window.gtag("event", "contact_form_submit", {
+          service: result.data.service,
+        });
+      }
       setSubmitting(false);
-      setSent(true);
+      setCount(newCount);
+      setConfirmed(result.data);
       (e.target as HTMLFormElement).reset();
-      setTimeout(() => setSent(false), 6000);
     }, 600);
   };
 
@@ -481,57 +552,65 @@ function Contact() {
                 <div className="font-bold group-hover:text-primary transition" dir="ltr">khalid.sh.dev@gmail.com</div>
               </div>
             </a>
+            <div className="mt-5 glass rounded-2xl p-5 flex items-center gap-4">
+              <div className="h-12 w-12 rounded-xl bg-primary/10 border border-primary/20 grid place-items-center text-primary">
+                <TrendingUp className="h-5 w-5" />
+              </div>
+              <div>
+                <div className="text-xs text-muted-foreground">طلبات مُستلمة عبر الموقع</div>
+                <div className="font-display text-xl text-gradient-cyan">{count}</div>
+              </div>
+            </div>
           </motion.div>
 
-          <motion.form
-            initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeUp}
-            onSubmit={handleSubmit} noValidate
-            className="lg:col-span-3 glass-strong rounded-3xl p-6 sm:p-7 space-y-5"
-          >
-            {sent && (
-              <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/30 p-4 flex items-start gap-3 text-emerald-300 animate-fade-in">
-                <CheckCircle2 className="h-5 w-5 shrink-0 mt-0.5" />
-                <div>
-                  <div className="font-bold">تم استلام رسالتك بنجاح</div>
-                  <div className="text-sm text-emerald-300/80 mt-0.5">سأتواصل معك خلال 24 ساعة على البريد الإلكتروني المُسجَّل.</div>
-                </div>
-              </div>
-            )}
-
-            <div className="grid sm:grid-cols-2 gap-5">
-              <Field label="الاسم الكامل" name="name" placeholder="اكتب اسمك" error={errors.name} />
-              <Field label="البريد الإلكتروني" name="email" type="email" placeholder="you@example.com" dir="ltr" error={errors.email} />
-            </div>
-            <div>
-              <label className="block text-sm mb-2 text-muted-foreground">نوع الخدمة</label>
-              <select
-                name="service"
-                defaultValue=""
-                className={`w-full bg-input border rounded-xl px-4 py-3 focus:outline-none transition ${errors.service ? "border-destructive focus:border-destructive" : "border-border focus:border-primary"}`}
-              >
-                <option value="">اختر الخدمة المطلوبة</option>
-                <option>إدارة حملات إعلانية</option>
-                <option>بناء نظام أتمتة مخصص</option>
-                <option>تحليل بيانات ولوحات أداء</option>
-                <option>استشارة تقنية</option>
-              </select>
-              {errors.service && <FieldError msg={errors.service} />}
-            </div>
-            <div>
-              <label className="block text-sm mb-2 text-muted-foreground">الرسالة</label>
-              <textarea
-                name="message" rows={5} placeholder="احكِ لي عن مشروعك..."
-                className={`w-full bg-input border rounded-xl px-4 py-3 focus:outline-none transition resize-none ${errors.message ? "border-destructive focus:border-destructive" : "border-border focus:border-primary"}`}
-              />
-              {errors.message && <FieldError msg={errors.message} />}
-            </div>
-            <button
-              type="submit" disabled={submitting}
-              className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[image:var(--gradient-cyan)] text-background py-4 font-bold glow-cyan hover:scale-[1.01] active:scale-[0.99] transition disabled:opacity-60"
-            >
-              {submitting ? "جارٍ الإرسال..." : (<><Send className="h-4 w-4" /> إرسال الرسالة</>)}
-            </button>
-          </motion.form>
+          <div className="lg:col-span-3">
+            <AnimatePresence mode="wait">
+              {confirmed ? (
+                <ConfirmationView key="confirm" data={confirmed} count={count} onReset={() => setConfirmed(null)} />
+              ) : (
+                <motion.form
+                  key="form"
+                  initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
+                  onSubmit={handleSubmit} noValidate
+                  className="glass-strong rounded-3xl p-6 sm:p-7 space-y-5"
+                >
+                  <div className="grid sm:grid-cols-2 gap-5">
+                    <Field label="الاسم الكامل" name="name" placeholder="اكتب اسمك" error={errors.name} />
+                    <Field label="البريد الإلكتروني" name="email" type="email" placeholder="you@example.com" dir="ltr" error={errors.email} />
+                  </div>
+                  <div>
+                    <label className="block text-sm mb-2 text-muted-foreground">نوع الخدمة</label>
+                    <select
+                      name="service"
+                      defaultValue=""
+                      className={`w-full bg-input border rounded-xl px-4 py-3 focus:outline-none transition ${errors.service ? "border-destructive focus:border-destructive" : "border-border focus:border-primary"}`}
+                    >
+                      <option value="">اختر الخدمة المطلوبة</option>
+                      <option>إدارة حملات إعلانية</option>
+                      <option>بناء نظام أتمتة مخصص</option>
+                      <option>تحليل بيانات ولوحات أداء</option>
+                      <option>استشارة تقنية</option>
+                    </select>
+                    {errors.service && <FieldError msg={errors.service} />}
+                  </div>
+                  <div>
+                    <label className="block text-sm mb-2 text-muted-foreground">الرسالة</label>
+                    <textarea
+                      name="message" rows={5} placeholder="احكِ لي عن مشروعك..."
+                      className={`w-full bg-input border rounded-xl px-4 py-3 focus:outline-none transition resize-none ${errors.message ? "border-destructive focus:border-destructive" : "border-border focus:border-primary"}`}
+                    />
+                    {errors.message && <FieldError msg={errors.message} />}
+                  </div>
+                  <button
+                    type="submit" disabled={submitting}
+                    className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[image:var(--gradient-cyan)] text-background py-4 font-bold glow-cyan hover:scale-[1.01] active:scale-[0.99] transition disabled:opacity-60"
+                  >
+                    {submitting ? "جارٍ الإرسال..." : (<><Send className="h-4 w-4" /> إرسال الرسالة</>)}
+                  </button>
+                </motion.form>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
       </div>
     </section>
