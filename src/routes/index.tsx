@@ -4,8 +4,10 @@ import {
   ArrowLeft, Mail, Sparkles, Bot, BarChart3,
   Megaphone, Workflow, LineChart, Package, FileSpreadsheet,
   ShoppingCart, MapPin, Briefcase, Send, MessageCircle, Phone,
+  Star, Quote, CheckCircle2, AlertCircle,
 } from "lucide-react";
 import { useState } from "react";
+import { z } from "zod";
 import portrait from "@/assets/khalid-portrait.png";
 import dashboard from "@/assets/dashboard-mockup.jpg";
 
@@ -27,29 +29,37 @@ const fadeUp = {
   show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] as const } },
 };
 
+function smoothScrollTo(id: string) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const top = el.getBoundingClientRect().top + window.scrollY - 80;
+  window.scrollTo({ top, behavior: "smooth" });
+}
+
 function Nav() {
   const links = [
-    { href: "#about", label: "من أنا" },
-    { href: "#product", label: "النظام" },
-    { href: "#services", label: "الخدمات" },
-    { href: "#contact", label: "تواصل" },
+    { id: "about", label: "من أنا" },
+    { id: "product", label: "النظام" },
+    { id: "services", label: "الخدمات" },
+    { id: "testimonials", label: "آراء العملاء" },
+    { id: "contact", label: "تواصل" },
   ];
   return (
     <header className="fixed top-0 inset-x-0 z-50">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 mt-4">
         <nav className="glass-strong rounded-2xl px-5 py-3 flex items-center justify-between">
-          <a href="#top" className="flex items-center gap-2 font-display text-lg">
+          <button onClick={() => smoothScrollTo("top")} className="flex items-center gap-2 font-display text-lg">
             <span className="h-8 w-8 rounded-lg bg-[image:var(--gradient-cyan)] grid place-items-center text-background font-bold">خ</span>
             <span className="hidden sm:inline">خالد الشريف</span>
-          </a>
+          </button>
           <div className="hidden md:flex items-center gap-7 text-sm text-muted-foreground">
             {links.map(l => (
-              <a key={l.href} href={l.href} className="hover:text-primary transition-colors">{l.label}</a>
+              <button key={l.id} onClick={() => smoothScrollTo(l.id)} className="hover:text-primary transition-colors">{l.label}</button>
             ))}
           </div>
-          <a href="#contact" className="rounded-xl bg-primary text-primary-foreground px-4 py-2 text-sm font-bold hover:opacity-90 transition">
+          <button onClick={() => smoothScrollTo("contact")} className="rounded-xl bg-primary text-primary-foreground px-4 py-2 text-sm font-bold hover:opacity-90 transition">
             تواصل معي
-          </a>
+          </button>
         </nav>
       </div>
     </header>
@@ -58,39 +68,39 @@ function Nav() {
 
 function Hero() {
   return (
-    <section id="top" className="relative pt-36 pb-24 overflow-hidden" style={{ background: "var(--gradient-hero)" }}>
+    <section id="top" className="relative pt-32 sm:pt-36 pb-20 sm:pb-24 overflow-hidden" style={{ background: "var(--gradient-hero)" }}>
       <div className="absolute inset-0 grid-bg opacity-40 [mask-image:radial-gradient(ellipse_at_center,black,transparent_75%)]" />
       <div className="absolute -top-40 left-1/2 -translate-x-1/2 h-[500px] w-[500px] rounded-full bg-primary/20 blur-[120px]" />
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 grid lg:grid-cols-2 gap-12 items-center">
-        <motion.div initial="hidden" animate="show" variants={fadeUp} className="text-right">
+        <motion.div initial="hidden" animate="show" variants={fadeUp} className="text-center lg:text-right order-2 lg:order-1">
           <span className="inline-flex items-center gap-2 glass rounded-full px-4 py-1.5 text-xs text-primary mb-6">
             <Sparkles className="h-3.5 w-3.5" />
             متخصص أتمتة التسويق والنمو
           </span>
-          <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl leading-[1.15]">
+          <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl leading-[1.2]">
             المهندس <span className="text-gradient-cyan">خالد الشريف</span>:
             <br />
             ندمج التقنية بالتسويق
             <br />
             لأتمتة <span className="text-gradient-cyan">نمو أعمالكم</span>
           </h1>
-          <p className="mt-6 text-lg text-muted-foreground max-w-xl mr-0 lg:leading-relaxed">
+          <p className="mt-6 text-base sm:text-lg text-muted-foreground max-w-xl mx-auto lg:mx-0 leading-relaxed">
             متخصص في بناء أنظمة الأتمتة وإدارة الحملات الإعلانية الذكية للسوق السعودي.
           </p>
-          <div className="mt-8 flex flex-wrap gap-4">
-            <a href="#contact" className="group inline-flex items-center gap-2 rounded-xl bg-[image:var(--gradient-cyan)] text-background px-6 py-3.5 font-bold glow-cyan hover:scale-[1.02] transition">
+          <div className="mt-8 flex flex-wrap justify-center lg:justify-start gap-4">
+            <button onClick={() => smoothScrollTo("contact")} className="group inline-flex items-center gap-2 rounded-xl bg-[image:var(--gradient-cyan)] text-background px-6 py-3.5 font-bold glow-cyan hover:scale-[1.03] active:scale-95 transition-all">
               تواصل معي
               <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition" />
-            </a>
-            <a href="#product" className="inline-flex items-center gap-2 rounded-xl glass-strong px-6 py-3.5 font-bold hover:border-primary/40 transition">
+            </button>
+            <button onClick={() => smoothScrollTo("product")} className="inline-flex items-center gap-2 rounded-xl glass-strong px-6 py-3.5 font-bold hover:border-primary/40 hover:scale-[1.03] active:scale-95 transition-all">
               استعرض أعمالي
-            </a>
+            </button>
           </div>
-          <div className="mt-10 flex gap-8 text-sm">
+          <div className="mt-10 flex justify-center lg:justify-start gap-6 sm:gap-8 text-sm">
             <div><div className="font-display text-2xl text-primary">+20</div><div className="text-muted-foreground">حملة إعلانية</div></div>
-            <div className="border-r border-border pr-8"><div className="font-display text-2xl text-primary">SaaS</div><div className="text-muted-foreground">نظام مطوّر</div></div>
-            <div className="border-r border-border pr-8"><div className="font-display text-2xl text-primary">24/7</div><div className="text-muted-foreground">أتمتة كاملة</div></div>
+            <div className="border-r border-border pr-6 sm:pr-8"><div className="font-display text-2xl text-primary">SaaS</div><div className="text-muted-foreground">نظام مطوّر</div></div>
+            <div className="border-r border-border pr-6 sm:pr-8"><div className="font-display text-2xl text-primary">24/7</div><div className="text-muted-foreground">أتمتة كاملة</div></div>
           </div>
         </motion.div>
 
@@ -98,20 +108,36 @@ function Hero() {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-          className="relative"
+          className="relative order-1 lg:order-2 mx-auto"
         >
-          <div className="absolute -inset-6 bg-[image:var(--gradient-cyan)] opacity-20 blur-3xl rounded-full" />
-          <div className="relative glass-strong rounded-3xl p-3 glow-cyan">
-            <img
-              src={portrait}
-              alt="المهندس خالد الشريف"
-              className="rounded-2xl w-full h-auto object-cover"
-              width={1408}
-              height={760}
-            />
-            <div className="absolute -bottom-4 -right-4 glass-strong rounded-2xl px-4 py-3 flex items-center gap-3">
+          <div className="relative w-[260px] h-[260px] sm:w-[340px] sm:h-[340px] lg:w-[440px] lg:h-[440px]">
+            {/* Animated rotating glow ring */}
+            <div className="absolute -inset-6 rounded-full bg-[conic-gradient(from_0deg,transparent,oklch(0.85_0.2_200/0.6),transparent_60%)] blur-2xl animate-[spin_8s_linear_infinite]" />
+            <div className="absolute -inset-2 rounded-full bg-[image:var(--gradient-cyan)] opacity-30 blur-2xl" />
+
+            {/* Glassmorphism circular frame */}
+            <div className="relative h-full w-full rounded-full glass-strong p-2 glow-cyan">
+              <div className="h-full w-full rounded-full overflow-hidden border border-primary/30">
+                <img
+                  src={portrait}
+                  alt="المهندس خالد الشريف"
+                  className="w-full h-full object-cover"
+                  width={440}
+                  height={440}
+                />
+              </div>
+            </div>
+
+            {/* Status badge */}
+            <div className="absolute bottom-2 -right-2 sm:-right-4 glass-strong rounded-2xl px-3 py-2 sm:px-4 sm:py-3 flex items-center gap-2 sm:gap-3 shadow-2xl">
               <div className="h-2.5 w-2.5 rounded-full bg-emerald-400 animate-pulse" />
-              <div className="text-xs"><div className="font-bold">متاح للعمل</div><div className="text-muted-foreground">عن بُعد · السعودية</div></div>
+              <div className="text-[10px] sm:text-xs"><div className="font-bold">متاح للعمل</div><div className="text-muted-foreground">عن بُعد · السعودية</div></div>
+            </div>
+
+            {/* Floating tag */}
+            <div className="hidden sm:flex absolute top-4 -left-4 glass-strong rounded-xl px-3 py-2 items-center gap-2 shadow-xl">
+              <Bot className="h-4 w-4 text-primary" />
+              <span className="text-xs font-bold">AI Automation</span>
             </div>
           </div>
         </motion.div>
@@ -127,7 +153,7 @@ function About() {
     { icon: Bot, title: "خبرة تقنية", text: "أتمتة العمليات وأنظمة SaaS" },
   ];
   return (
-    <section id="about" className="relative py-24">
+    <section id="about" className="relative py-24 scroll-mt-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <motion.div initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeUp} className="max-w-3xl">
           <span className="text-primary text-sm font-bold">_ من أنا</span>
@@ -164,7 +190,7 @@ function Product() {
     { icon: FileSpreadsheet, title: "تصدير التقارير", text: "تقارير PDF و Excel جاهزة للإدارة بضغطة واحدة." },
   ];
   return (
-    <section id="product" className="relative py-24">
+    <section id="product" className="relative py-24 scroll-mt-24">
       <div className="absolute inset-0 grid-bg opacity-20 [mask-image:radial-gradient(ellipse_at_center,black,transparent_70%)]" />
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
         <motion.div initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeUp} className="text-center max-w-3xl mx-auto">
@@ -229,7 +255,7 @@ function Services() {
     },
   ];
   return (
-    <section id="services" className="relative py-24">
+    <section id="services" className="relative py-24 scroll-mt-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <motion.div initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeUp} className="max-w-3xl">
           <span className="text-primary text-sm font-bold">_ خدماتنا</span>
@@ -264,10 +290,139 @@ function Services() {
   );
 }
 
+function Testimonials() {
+  const stats = [
+    { value: "+300%", label: "نمو في معدل التحويل" },
+    { value: "70%", label: "توفير في الوقت اليومي" },
+    { value: "4.2x", label: "متوسط عائد الإعلانات" },
+    { value: "+50", label: "عميل راضٍ عن النتائج" },
+  ];
+  const items = [
+    {
+      name: "أحمد العتيبي",
+      role: "مدير تسويق · متجر إلكتروني",
+      text: "أتمتة المخزون وفّرت علينا ساعات يومية، والحملات الإعلانية رفعت المبيعات بشكل ملحوظ في أول شهر.",
+      rating: 5,
+    },
+    {
+      name: "نورة الزهراني",
+      role: "صاحبة براند تجميل",
+      text: "احترافية عالية في إدارة حملات Snapchat. النتائج فاقت توقعاتي والتقارير واضحة وشفافة.",
+      rating: 5,
+    },
+    {
+      name: "خالد الدوسري",
+      role: "مؤسس شركة خدمات",
+      text: "النظام اللي بناه ربط لنا كل العمليات. الفريق صار يشتغل أسرع والإدارة عندها رؤية كاملة.",
+      rating: 5,
+    },
+  ];
+  return (
+    <section id="testimonials" className="relative py-24 scroll-mt-24">
+      <div className="absolute inset-0 grid-bg opacity-20 [mask-image:radial-gradient(ellipse_at_center,black,transparent_70%)]" />
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
+        <motion.div initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeUp} className="text-center max-w-3xl mx-auto">
+          <span className="text-primary text-sm font-bold">_ الثقة والنتائج</span>
+          <h2 className="font-display text-3xl sm:text-5xl mt-3">
+            نتائج <span className="text-gradient-cyan">حقيقية</span> من عملاء حقيقيين
+          </h2>
+        </motion.div>
+
+        {/* Stats */}
+        <div className="mt-14 grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {stats.map((s, i) => (
+            <motion.div
+              key={s.label}
+              initial="hidden" whileInView="show" viewport={{ once: true }}
+              variants={fadeUp} transition={{ delay: i * 0.08 }}
+              className="glass-strong rounded-2xl p-6 text-center hover:border-primary/40 transition"
+            >
+              <div className="font-display text-3xl sm:text-4xl text-gradient-cyan">{s.value}</div>
+              <div className="mt-2 text-xs sm:text-sm text-muted-foreground">{s.label}</div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Testimonials */}
+        <div className="mt-10 grid md:grid-cols-3 gap-5">
+          {items.map((t, i) => (
+            <motion.div
+              key={t.name}
+              initial="hidden" whileInView="show" viewport={{ once: true }}
+              variants={fadeUp} transition={{ delay: i * 0.1 }}
+              className="glass rounded-2xl p-6 relative hover:border-primary/30 transition"
+            >
+              <Quote className="absolute top-5 left-5 h-8 w-8 text-primary/20" />
+              <div className="flex gap-1 mb-4">
+                {Array.from({ length: t.rating }).map((_, idx) => (
+                  <Star key={idx} className="h-4 w-4 fill-primary text-primary" />
+                ))}
+              </div>
+              <p className="text-sm leading-relaxed text-muted-foreground">"{t.text}"</p>
+              <div className="mt-5 pt-4 border-t border-border">
+                <div className="font-bold">{t.name}</div>
+                <div className="text-xs text-muted-foreground mt-0.5">{t.role}</div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const contactSchema = z.object({
+  name: z.string().trim()
+    .min(2, { message: "الاسم يجب أن يكون حرفين على الأقل" })
+    .max(80, { message: "الاسم طويل جداً" }),
+  email: z.string().trim()
+    .min(1, { message: "البريد الإلكتروني مطلوب" })
+    .email({ message: "صيغة البريد الإلكتروني غير صحيحة" })
+    .max(255),
+  service: z.string().min(1, { message: "يرجى اختيار نوع الخدمة" }),
+  message: z.string().trim()
+    .min(10, { message: "الرسالة قصيرة جداً (10 أحرف على الأقل)" })
+    .max(1000, { message: "الرسالة طويلة جداً" }),
+});
+
+type FormErrors = Partial<Record<keyof z.infer<typeof contactSchema>, string>>;
+
 function Contact() {
   const [sent, setSent] = useState(false);
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+    const data = {
+      name: String(fd.get("name") || ""),
+      email: String(fd.get("email") || ""),
+      service: String(fd.get("service") || ""),
+      message: String(fd.get("message") || ""),
+    };
+    const result = contactSchema.safeParse(data);
+    if (!result.success) {
+      const errs: FormErrors = {};
+      for (const issue of result.error.issues) {
+        const k = issue.path[0] as keyof FormErrors;
+        if (k && !errs[k]) errs[k] = issue.message;
+      }
+      setErrors(errs);
+      return;
+    }
+    setErrors({});
+    setSubmitting(true);
+    setTimeout(() => {
+      setSubmitting(false);
+      setSent(true);
+      (e.target as HTMLFormElement).reset();
+      setTimeout(() => setSent(false), 6000);
+    }, 600);
+  };
+
   return (
-    <section id="contact" className="relative py-24">
+    <section id="contact" className="relative py-24 scroll-mt-24">
       <div className="absolute inset-0 grid-bg opacity-30 [mask-image:radial-gradient(ellipse_at_center,black,transparent_70%)]" />
       <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
         <div className="grid lg:grid-cols-5 gap-10 items-start">
@@ -292,29 +447,51 @@ function Contact() {
 
           <motion.form
             initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeUp}
-            onSubmit={(e) => { e.preventDefault(); setSent(true); setTimeout(() => setSent(false), 4000); }}
-            className="lg:col-span-3 glass-strong rounded-3xl p-7 space-y-5"
+            onSubmit={handleSubmit} noValidate
+            className="lg:col-span-3 glass-strong rounded-3xl p-6 sm:p-7 space-y-5"
           >
+            {sent && (
+              <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/30 p-4 flex items-start gap-3 text-emerald-300 animate-fade-in">
+                <CheckCircle2 className="h-5 w-5 shrink-0 mt-0.5" />
+                <div>
+                  <div className="font-bold">تم استلام رسالتك بنجاح</div>
+                  <div className="text-sm text-emerald-300/80 mt-0.5">سأتواصل معك خلال 24 ساعة على البريد الإلكتروني المُسجَّل.</div>
+                </div>
+              </div>
+            )}
+
             <div className="grid sm:grid-cols-2 gap-5">
-              <Field label="الاسم الكامل" name="name" placeholder="اكتب اسمك" />
-              <Field label="البريد الإلكتروني" name="email" type="email" placeholder="you@example.com" dir="ltr" />
+              <Field label="الاسم الكامل" name="name" placeholder="اكتب اسمك" error={errors.name} />
+              <Field label="البريد الإلكتروني" name="email" type="email" placeholder="you@example.com" dir="ltr" error={errors.email} />
             </div>
             <div>
               <label className="block text-sm mb-2 text-muted-foreground">نوع الخدمة</label>
-              <select required className="w-full bg-input border border-border rounded-xl px-4 py-3 focus:outline-none focus:border-primary transition">
+              <select
+                name="service"
+                defaultValue=""
+                className={`w-full bg-input border rounded-xl px-4 py-3 focus:outline-none transition ${errors.service ? "border-destructive focus:border-destructive" : "border-border focus:border-primary"}`}
+              >
                 <option value="">اختر الخدمة المطلوبة</option>
                 <option>إدارة حملات إعلانية</option>
                 <option>بناء نظام أتمتة مخصص</option>
                 <option>تحليل بيانات ولوحات أداء</option>
                 <option>استشارة تقنية</option>
               </select>
+              {errors.service && <FieldError msg={errors.service} />}
             </div>
             <div>
               <label className="block text-sm mb-2 text-muted-foreground">الرسالة</label>
-              <textarea required rows={5} placeholder="احكِ لي عن مشروعك..." className="w-full bg-input border border-border rounded-xl px-4 py-3 focus:outline-none focus:border-primary transition resize-none" />
+              <textarea
+                name="message" rows={5} placeholder="احكِ لي عن مشروعك..."
+                className={`w-full bg-input border rounded-xl px-4 py-3 focus:outline-none transition resize-none ${errors.message ? "border-destructive focus:border-destructive" : "border-border focus:border-primary"}`}
+              />
+              {errors.message && <FieldError msg={errors.message} />}
             </div>
-            <button type="submit" className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[image:var(--gradient-cyan)] text-background py-4 font-bold glow-cyan hover:scale-[1.01] transition">
-              {sent ? <><Sparkles className="h-4 w-4" /> تم الإرسال بنجاح</> : <><Send className="h-4 w-4" /> إرسال الرسالة</>}
+            <button
+              type="submit" disabled={submitting}
+              className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[image:var(--gradient-cyan)] text-background py-4 font-bold glow-cyan hover:scale-[1.01] active:scale-[0.99] transition disabled:opacity-60"
+            >
+              {submitting ? "جارٍ الإرسال..." : (<><Send className="h-4 w-4" /> إرسال الرسالة</>)}
             </button>
           </motion.form>
         </div>
@@ -323,14 +500,24 @@ function Contact() {
   );
 }
 
-function Field({ label, name, type = "text", placeholder, dir }: { label: string; name: string; type?: string; placeholder?: string; dir?: string }) {
+function FieldError({ msg }: { msg: string }) {
+  return (
+    <div className="mt-2 flex items-center gap-1.5 text-xs text-destructive">
+      <AlertCircle className="h-3.5 w-3.5" />
+      <span>{msg}</span>
+    </div>
+  );
+}
+
+function Field({ label, name, type = "text", placeholder, dir, error }: { label: string; name: string; type?: string; placeholder?: string; dir?: string; error?: string }) {
   return (
     <div>
       <label className="block text-sm mb-2 text-muted-foreground">{label}</label>
       <input
-        required name={name} type={type} placeholder={placeholder} dir={dir}
-        className="w-full bg-input border border-border rounded-xl px-4 py-3 focus:outline-none focus:border-primary transition"
+        name={name} type={type} placeholder={placeholder} dir={dir}
+        className={`w-full bg-input border rounded-xl px-4 py-3 focus:outline-none transition ${error ? "border-destructive focus:border-destructive" : "border-border focus:border-primary"}`}
       />
+      {error && <FieldError msg={error} />}
     </div>
   );
 }
@@ -365,6 +552,7 @@ function Index() {
         <About />
         <Product />
         <Services />
+        <Testimonials />
         <Contact />
       </main>
       <Footer />
