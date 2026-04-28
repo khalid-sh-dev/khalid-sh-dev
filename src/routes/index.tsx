@@ -1,28 +1,66 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft, Mail, Sparkles, Bot, BarChart3,
   Megaphone, Workflow, LineChart, Package, FileSpreadsheet,
   ShoppingCart, MapPin, Briefcase, Send, MessageCircle, Phone,
-  Star, Quote, CheckCircle2, AlertCircle,
+  Star, Quote, CheckCircle2, AlertCircle, ChevronDown, TrendingUp, RotateCcw,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import portrait from "@/assets/khalid-portrait.png";
 import dashboard from "@/assets/dashboard-mockup.jpg";
 
+const PAGE_TITLE = "المهندس خالد الشريف — أتمتة التسويق والنمو";
+const PAGE_DESC = "متخصص في بناء أنظمة الأتمتة وإدارة الحملات الإعلانية الذكية للسوق السعودي. ندمج التقنية بالتسويق لأتمتة نمو أعمالكم.";
+
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "المهندس خالد الشريف — أتمتة التسويق والنمو" },
-      { name: "description", content: "متخصص في بناء أنظمة الأتمتة وإدارة الحملات الإعلانية الذكية للسوق السعودي. ندمج التقنية بالتسويق لأتمتة نمو أعمالكم." },
-      { property: "og:title", content: "المهندس خالد الشريف — أتمتة التسويق والنمو" },
-      { property: "og:description", content: "بناء أنظمة SaaS وأتمتة العمليات وإدارة حملات Snapchat & TikTok للسوق السعودي." },
+      { title: PAGE_TITLE },
+      { name: "description", content: PAGE_DESC },
+      { property: "og:title", content: PAGE_TITLE },
+      { property: "og:description", content: PAGE_DESC },
+      { property: "og:url", content: "/" },
+      { name: "twitter:title", content: PAGE_TITLE },
+      { name: "twitter:description", content: PAGE_DESC },
       { name: "theme-color", content: "#0b1426" },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Person",
+          name: "المهندس خالد الشريف",
+          jobTitle: "متخصص أتمتة التسويق والنمو",
+          email: "khalid.sh.dev@gmail.com",
+          description: PAGE_DESC,
+          knowsAbout: ["Marketing Automation", "SaaS", "Snapchat Ads", "TikTok Ads", "Data Analytics"],
+          areaServed: "SA",
+        }),
+      },
     ],
   }),
   component: Index,
 });
+
+declare global {
+  interface Window {
+    gtag?: (...args: unknown[]) => void;
+  }
+}
+
+const SUBMIT_COUNT_KEY = "contact_submissions_count";
+function getSubmissionCount(): number {
+  if (typeof window === "undefined") return 0;
+  return parseInt(localStorage.getItem(SUBMIT_COUNT_KEY) || "0", 10) || 0;
+}
+function incrementSubmissionCount(): number {
+  const next = getSubmissionCount() + 1;
+  localStorage.setItem(SUBMIT_COUNT_KEY, String(next));
+  return next;
+}
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -42,6 +80,7 @@ function Nav() {
     { id: "product", label: "النظام" },
     { id: "services", label: "الخدمات" },
     { id: "testimonials", label: "آراء العملاء" },
+    { id: "faq", label: "أسئلة شائعة" },
     { id: "contact", label: "تواصل" },
   ];
   return (
@@ -371,6 +410,87 @@ function Testimonials() {
   );
 }
 
+function FAQ() {
+  const items = [
+    {
+      q: "كم تستغرق عملية بناء نظام أتمتة مخصص؟",
+      a: "تختلف المدة حسب التعقيد، لكن أغلب المشاريع تكتمل خلال 2 إلى 6 أسابيع، بعد جلسة تحليل أولية لتحديد العمليات والتكاملات المطلوبة.",
+    },
+    {
+      q: "هل تدعمون السوق السعودي تحديداً في الحملات الإعلانية؟",
+      a: "نعم، تخصصي الأساسي هو حملات Snapchat و TikTok للسوق السعودي، مع فهم عميق لسلوك المستخدم وأفضل أوقات النشر والمحتوى المناسب ثقافياً.",
+    },
+    {
+      q: "ما الأدوات التي تستخدمها في الأتمتة؟",
+      a: "أعتمد على Make و Zapier و n8n للأتمتة المرنة، مع كتابة سكريبتات مخصصة عند الحاجة، وربط APIs مباشرة لضمان الأداء والاستقرار.",
+    },
+    {
+      q: "هل أحصل على تقارير دورية عن أداء الحملات؟",
+      a: "بالتأكيد، يصلك تقرير أسبوعي مفصّل وآخر شهري مع توصيات تحسين، بالإضافة إلى لوحة Looker Studio حية يمكنك متابعتها في أي وقت.",
+    },
+    {
+      q: "هل تقدمون دعماً بعد تسليم المشروع؟",
+      a: "نعم، كل مشروع يتضمن فترة دعم مجانية لمدة 30 يوماً، مع إمكانية الاشتراك في باقات الصيانة والتطوير المستمر.",
+    },
+    {
+      q: "كيف تتم عملية الدفع وما هي الأسعار؟",
+      a: "السعر يعتمد على نطاق المشروع، ويتم الاتفاق على دفعة مقدمة وأخرى عند التسليم. تواصل معي للحصول على عرض سعر مخصص لمشروعك.",
+    },
+  ];
+  const [open, setOpen] = useState<number | null>(0);
+  return (
+    <section id="faq" className="relative py-24 scroll-mt-24">
+      <div className="mx-auto max-w-4xl px-4 sm:px-6">
+        <motion.div initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeUp} className="text-center">
+          <span className="text-primary text-sm font-bold">_ الأسئلة الشائعة</span>
+          <h2 className="font-display text-3xl sm:text-5xl mt-3">
+            استفسارات <span className="text-gradient-cyan">متكررة</span>
+          </h2>
+          <p className="mt-4 text-muted-foreground">إجابات مباشرة على أكثر ما يسأله العملاء قبل البدء.</p>
+        </motion.div>
+
+        <div className="mt-12 space-y-3">
+          {items.map((it, i) => {
+            const isOpen = open === i;
+            return (
+              <motion.div
+                key={it.q}
+                initial="hidden" whileInView="show" viewport={{ once: true }}
+                variants={fadeUp} transition={{ delay: i * 0.05 }}
+                className={`glass rounded-2xl overflow-hidden transition ${isOpen ? "border-primary/40" : ""}`}
+              >
+                <button
+                  onClick={() => setOpen(isOpen ? null : i)}
+                  className="w-full flex items-center justify-between gap-4 p-5 text-right hover:bg-card/30 transition"
+                  aria-expanded={isOpen}
+                >
+                  <span className="font-bold text-base sm:text-lg flex-1">{it.q}</span>
+                  <ChevronDown className={`h-5 w-5 text-primary shrink-0 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} />
+                </button>
+                <AnimatePresence initial={false}>
+                  {isOpen && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                      className="overflow-hidden"
+                    >
+                      <div className="px-5 pb-5 text-muted-foreground leading-relaxed text-sm sm:text-base border-t border-border/50 pt-4">
+                        {it.a}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 const contactSchema = z.object({
   name: z.string().trim()
     .min(2, { message: "الاسم يجب أن يكون حرفين على الأقل" })
@@ -385,12 +505,72 @@ const contactSchema = z.object({
     .max(1000, { message: "الرسالة طويلة جداً" }),
 });
 
-type FormErrors = Partial<Record<keyof z.infer<typeof contactSchema>, string>>;
+type ContactData = z.infer<typeof contactSchema>;
+type FormErrors = Partial<Record<keyof ContactData, string>>;
+
+function maskEmail(email: string): string {
+  const [user, domain] = email.split("@");
+  if (!user || !domain) return "***";
+  const head = user.slice(0, 2);
+  const tail = user.length > 3 ? user.slice(-1) : "";
+  return `${head}${"•".repeat(Math.max(2, user.length - 3))}${tail}@${domain}`;
+}
+
+function ConfirmationView({ data, count, onReset }: { data: ContactData; count: number; onReset: () => void }) {
+  const ticket = `KS-${Date.now().toString(36).toUpperCase().slice(-6)}`;
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      className="glass-strong rounded-3xl p-7 sm:p-9 text-center"
+    >
+      <div className="mx-auto h-16 w-16 rounded-full bg-emerald-500/15 border border-emerald-500/40 grid place-items-center glow-cyan">
+        <CheckCircle2 className="h-8 w-8 text-emerald-400" />
+      </div>
+      <h3 className="mt-6 font-display text-2xl sm:text-3xl">شكراً {data.name.split(" ")[0]}، استلمنا طلبك ✨</h3>
+      <p className="mt-3 text-muted-foreground leading-relaxed max-w-md mx-auto">
+        سأراجع طلبك وأرد عليك خلال 24 ساعة. تم تسجيل الطلب بنجاح في نظامنا.
+      </p>
+
+      <div className="mt-7 grid sm:grid-cols-3 gap-3 text-right">
+        <div className="glass rounded-xl p-4">
+          <div className="text-xs text-muted-foreground">رقم المرجع</div>
+          <div className="font-bold mt-1 font-mono text-primary" dir="ltr">{ticket}</div>
+        </div>
+        <div className="glass rounded-xl p-4">
+          <div className="text-xs text-muted-foreground">نوع الخدمة</div>
+          <div className="font-bold mt-1 text-sm">{data.service}</div>
+        </div>
+        <div className="glass rounded-xl p-4">
+          <div className="text-xs text-muted-foreground">البريد للتواصل</div>
+          <div className="font-bold mt-1 text-sm" dir="ltr">{maskEmail(data.email)}</div>
+        </div>
+      </div>
+
+      <div className="mt-6 inline-flex items-center gap-2 text-xs text-muted-foreground glass rounded-full px-4 py-2">
+        <TrendingUp className="h-3.5 w-3.5 text-primary" />
+        إجمالي الطلبات المُستلمة عبر الموقع: <span className="font-bold text-primary">{count}</span>
+      </div>
+
+      <div className="mt-7 flex flex-wrap justify-center gap-3">
+        <a href="mailto:khalid.sh.dev@gmail.com" className="inline-flex items-center gap-2 rounded-xl bg-[image:var(--gradient-cyan)] text-background px-5 py-3 font-bold glow-cyan hover:scale-[1.02] transition">
+          <Mail className="h-4 w-4" /> فتح البريد مباشرة
+        </a>
+        <button onClick={onReset} className="inline-flex items-center gap-2 rounded-xl glass-strong px-5 py-3 font-bold hover:border-primary/40 transition">
+          <RotateCcw className="h-4 w-4" /> إرسال طلب جديد
+        </button>
+      </div>
+    </motion.div>
+  );
+}
 
 function Contact() {
-  const [sent, setSent] = useState(false);
+  const [confirmed, setConfirmed] = useState<ContactData | null>(null);
+  const [count, setCount] = useState(0);
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => { setCount(getSubmissionCount()); }, []);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -414,10 +594,22 @@ function Contact() {
     setErrors({});
     setSubmitting(true);
     setTimeout(() => {
+      const newCount = incrementSubmissionCount();
+      // Google Analytics conversion event
+      if (typeof window !== "undefined" && typeof window.gtag === "function") {
+        window.gtag("event", "generate_lead", {
+          event_category: "contact",
+          event_label: result.data.service,
+          value: 1,
+        });
+        window.gtag("event", "contact_form_submit", {
+          service: result.data.service,
+        });
+      }
       setSubmitting(false);
-      setSent(true);
+      setCount(newCount);
+      setConfirmed(result.data);
       (e.target as HTMLFormElement).reset();
-      setTimeout(() => setSent(false), 6000);
     }, 600);
   };
 
@@ -443,57 +635,65 @@ function Contact() {
                 <div className="font-bold group-hover:text-primary transition" dir="ltr">khalid.sh.dev@gmail.com</div>
               </div>
             </a>
+            <div className="mt-5 glass rounded-2xl p-5 flex items-center gap-4">
+              <div className="h-12 w-12 rounded-xl bg-primary/10 border border-primary/20 grid place-items-center text-primary">
+                <TrendingUp className="h-5 w-5" />
+              </div>
+              <div>
+                <div className="text-xs text-muted-foreground">طلبات مُستلمة عبر الموقع</div>
+                <div className="font-display text-xl text-gradient-cyan">{count}</div>
+              </div>
+            </div>
           </motion.div>
 
-          <motion.form
-            initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeUp}
-            onSubmit={handleSubmit} noValidate
-            className="lg:col-span-3 glass-strong rounded-3xl p-6 sm:p-7 space-y-5"
-          >
-            {sent && (
-              <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/30 p-4 flex items-start gap-3 text-emerald-300 animate-fade-in">
-                <CheckCircle2 className="h-5 w-5 shrink-0 mt-0.5" />
-                <div>
-                  <div className="font-bold">تم استلام رسالتك بنجاح</div>
-                  <div className="text-sm text-emerald-300/80 mt-0.5">سأتواصل معك خلال 24 ساعة على البريد الإلكتروني المُسجَّل.</div>
-                </div>
-              </div>
-            )}
-
-            <div className="grid sm:grid-cols-2 gap-5">
-              <Field label="الاسم الكامل" name="name" placeholder="اكتب اسمك" error={errors.name} />
-              <Field label="البريد الإلكتروني" name="email" type="email" placeholder="you@example.com" dir="ltr" error={errors.email} />
-            </div>
-            <div>
-              <label className="block text-sm mb-2 text-muted-foreground">نوع الخدمة</label>
-              <select
-                name="service"
-                defaultValue=""
-                className={`w-full bg-input border rounded-xl px-4 py-3 focus:outline-none transition ${errors.service ? "border-destructive focus:border-destructive" : "border-border focus:border-primary"}`}
-              >
-                <option value="">اختر الخدمة المطلوبة</option>
-                <option>إدارة حملات إعلانية</option>
-                <option>بناء نظام أتمتة مخصص</option>
-                <option>تحليل بيانات ولوحات أداء</option>
-                <option>استشارة تقنية</option>
-              </select>
-              {errors.service && <FieldError msg={errors.service} />}
-            </div>
-            <div>
-              <label className="block text-sm mb-2 text-muted-foreground">الرسالة</label>
-              <textarea
-                name="message" rows={5} placeholder="احكِ لي عن مشروعك..."
-                className={`w-full bg-input border rounded-xl px-4 py-3 focus:outline-none transition resize-none ${errors.message ? "border-destructive focus:border-destructive" : "border-border focus:border-primary"}`}
-              />
-              {errors.message && <FieldError msg={errors.message} />}
-            </div>
-            <button
-              type="submit" disabled={submitting}
-              className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[image:var(--gradient-cyan)] text-background py-4 font-bold glow-cyan hover:scale-[1.01] active:scale-[0.99] transition disabled:opacity-60"
-            >
-              {submitting ? "جارٍ الإرسال..." : (<><Send className="h-4 w-4" /> إرسال الرسالة</>)}
-            </button>
-          </motion.form>
+          <div className="lg:col-span-3">
+            <AnimatePresence mode="wait">
+              {confirmed ? (
+                <ConfirmationView key="confirm" data={confirmed} count={count} onReset={() => setConfirmed(null)} />
+              ) : (
+                <motion.form
+                  key="form"
+                  initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
+                  onSubmit={handleSubmit} noValidate
+                  className="glass-strong rounded-3xl p-6 sm:p-7 space-y-5"
+                >
+                  <div className="grid sm:grid-cols-2 gap-5">
+                    <Field label="الاسم الكامل" name="name" placeholder="اكتب اسمك" error={errors.name} />
+                    <Field label="البريد الإلكتروني" name="email" type="email" placeholder="you@example.com" dir="ltr" error={errors.email} />
+                  </div>
+                  <div>
+                    <label className="block text-sm mb-2 text-muted-foreground">نوع الخدمة</label>
+                    <select
+                      name="service"
+                      defaultValue=""
+                      className={`w-full bg-input border rounded-xl px-4 py-3 focus:outline-none transition ${errors.service ? "border-destructive focus:border-destructive" : "border-border focus:border-primary"}`}
+                    >
+                      <option value="">اختر الخدمة المطلوبة</option>
+                      <option>إدارة حملات إعلانية</option>
+                      <option>بناء نظام أتمتة مخصص</option>
+                      <option>تحليل بيانات ولوحات أداء</option>
+                      <option>استشارة تقنية</option>
+                    </select>
+                    {errors.service && <FieldError msg={errors.service} />}
+                  </div>
+                  <div>
+                    <label className="block text-sm mb-2 text-muted-foreground">الرسالة</label>
+                    <textarea
+                      name="message" rows={5} placeholder="احكِ لي عن مشروعك..."
+                      className={`w-full bg-input border rounded-xl px-4 py-3 focus:outline-none transition resize-none ${errors.message ? "border-destructive focus:border-destructive" : "border-border focus:border-primary"}`}
+                    />
+                    {errors.message && <FieldError msg={errors.message} />}
+                  </div>
+                  <button
+                    type="submit" disabled={submitting}
+                    className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[image:var(--gradient-cyan)] text-background py-4 font-bold glow-cyan hover:scale-[1.01] active:scale-[0.99] transition disabled:opacity-60"
+                  >
+                    {submitting ? "جارٍ الإرسال..." : (<><Send className="h-4 w-4" /> إرسال الرسالة</>)}
+                  </button>
+                </motion.form>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
       </div>
     </section>
@@ -553,6 +753,7 @@ function Index() {
         <Product />
         <Services />
         <Testimonials />
+        <FAQ />
         <Contact />
       </main>
       <Footer />
