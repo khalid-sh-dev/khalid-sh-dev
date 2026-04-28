@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import {
   ArrowLeft, Mail, Sparkles, Bot, BarChart3,
   Megaphone, Workflow, LineChart, Package, FileSpreadsheet,
-  ShoppingCart, MapPin, Briefcase, Send, Twitter, MessageCircle,
+  ShoppingCart, MapPin, Briefcase, Send, MessageCircle, Phone,
 } from "lucide-react";
 import { useState } from "react";
 import portrait from "@/assets/khalid-portrait.png";
@@ -348,8 +348,8 @@ function Footer() {
         </div>
         <div className="flex items-center gap-3">
           <a href="mailto:khalid.sh.dev@gmail.com" className="h-10 w-10 grid place-items-center rounded-lg glass hover:text-primary transition"><Mail className="h-4 w-4" /></a>
-          <a href="#" aria-label="LinkedIn" className="h-10 w-10 grid place-items-center rounded-lg glass hover:text-primary transition"><Linkedin className="h-4 w-4" /></a>
-          <a href="#" aria-label="GitHub" className="h-10 w-10 grid place-items-center rounded-lg glass hover:text-primary transition"><Github className="h-4 w-4" /></a>
+          <a href="#" aria-label="WhatsApp" className="h-10 w-10 grid place-items-center rounded-lg glass hover:text-primary transition"><MessageCircle className="h-4 w-4" /></a>
+          <a href="#" aria-label="Phone" className="h-10 w-10 grid place-items-center rounded-lg glass hover:text-primary transition"><Phone className="h-4 w-4" /></a>
         </div>
       </div>
     </footer>
