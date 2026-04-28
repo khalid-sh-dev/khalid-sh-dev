@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import {
-  ArrowLeft, Mail, MessageSquare, Sparkles, Bot, BarChart3,
+  ArrowLeft, Mail, Sparkles, Bot, BarChart3,
   Megaphone, Workflow, LineChart, Package, FileSpreadsheet,
-  ShoppingCart, MapPin, Briefcase, Send, Github, Linkedin,
+  ShoppingCart, MapPin, Briefcase, Send, Twitter, MessageCircle,
 } from "lucide-react";
 import { useState } from "react";
 import portrait from "@/assets/khalid-portrait.png";
