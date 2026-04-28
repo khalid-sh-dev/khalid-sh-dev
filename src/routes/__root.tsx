@@ -31,14 +31,18 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "المهندس خالد الشريف — أتمتة التسويق والنمو" },
-      { name: "description", content: "متخصص في بناء أنظمة الأتمتة وإدارة الحملات الإعلانية الذكية للسوق السعودي." },
       { name: "author", content: "خالد الشريف" },
-      { property: "og:title", content: "المهندس خالد الشريف" },
-      { property: "og:description", content: "ندمج التقنية بالتسويق لأتمتة نمو أعمالكم." },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
+      { property: "og:locale", content: "ar_SA" },
+      { property: "og:site_name", content: "المهندس خالد الشريف" },
+      { property: "og:image", content: "/og-image.jpg" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "640" },
+      { property: "og:image:alt", content: "المهندس خالد الشريف — أتمتة التسويق والنمو" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:image", content: "/og-image.jpg" },
+      { name: "twitter:image:alt", content: "المهندس خالد الشريف — أتمتة التسويق والنمو" },
       { name: "theme-color", content: "#0b1426" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
@@ -51,6 +55,14 @@ export const Route = createRootRoute({
       { rel: "icon", type: "image/png", sizes: "512x512", href: "/icons/icon-512.png" },
       { rel: "apple-touch-icon", href: "/icons/icon-192.png" },
     ],
+    scripts: GA_ID
+      ? [
+          { src: `https://www.googletagmanager.com/gtag/js?id=${GA_ID}`, async: true },
+          {
+            children: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}window.gtag=gtag;gtag('js',new Date());gtag('config','${GA_ID}',{anonymize_ip:true});`,
+          },
+        ]
+      : [],
   }),
   shellComponent: RootShell,
   component: RootComponent,
