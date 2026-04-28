@@ -424,6 +424,7 @@ const contactSchema = z.object({
 });
 
 type ContactData = z.infer<typeof contactSchema>;
+type FormErrors = Partial<Record<keyof ContactData, string>>;
 
 function maskEmail(email: string): string {
   const [user, domain] = email.split("@");
