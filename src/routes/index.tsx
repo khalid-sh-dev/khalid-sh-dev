@@ -80,6 +80,7 @@ function Nav() {
     { id: "product", label: "النظام" },
     { id: "services", label: "الخدمات" },
     { id: "testimonials", label: "آراء العملاء" },
+    { id: "faq", label: "أسئلة شائعة" },
     { id: "contact", label: "تواصل" },
   ];
   return (
