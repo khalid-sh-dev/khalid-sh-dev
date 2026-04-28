@@ -1,6 +1,8 @@
-import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
+import { Outlet, Link, createRootRoute, HeadContent, Scripts, ScriptOnce } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
+
+const GA_ID = (import.meta.env.VITE_GA_MEASUREMENT_ID as string | undefined) || "";
 
 function NotFoundComponent() {
   return (
