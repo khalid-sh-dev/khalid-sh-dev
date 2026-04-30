@@ -151,12 +151,13 @@
 .bg-aurora {
   position: fixed;
   inset: 0;
-  z-index: -1;
+  z-index: 0;
   pointer-events: none;
   overflow: hidden;
   background:
     radial-gradient(ellipse at top, oklch(0.22 0.06 250) 0%, oklch(0.16 0.04 258) 60%);
 }
+.bg-aurora ~ * { position: relative; z-index: 1; }
 .bg-aurora::before,
 .bg-aurora::after,
 .bg-aurora > .blob {
