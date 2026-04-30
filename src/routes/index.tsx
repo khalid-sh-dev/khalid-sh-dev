@@ -1015,20 +1015,34 @@ function Footer() {
   );
 }
 
+function AnimatedBackground() {
+  return (
+    <div className="bg-aurora" aria-hidden="true">
+      <span className="blob" />
+      <span className="grid" />
+      <span className="noise" />
+    </div>
+  );
+}
+
 function Index() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen relative">
+      <AnimatedBackground />
       <Nav />
       <main>
         <Hero />
         <About />
+        <Skills />
         <Product />
         <Services />
+        <Portfolio />
         <Testimonials />
         <FAQ />
         <Contact />
       </main>
       <Footer />
+      <AIChatWidget />
     </div>
   );
 }
