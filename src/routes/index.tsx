@@ -5,8 +5,7 @@ import {
   Megaphone, Workflow, LineChart, Package, FileSpreadsheet,
   ShoppingCart, MapPin, Briefcase, Send, MessageCircle, Phone,
   Star, Quote, CheckCircle2, AlertCircle, ChevronDown, TrendingUp, RotateCcw,
-  Code2, Database, Globe, Zap, Target, Layers, Cpu, Palette,
-  ArrowUpRight, Settings2, Rocket, ShieldCheck,
+  Code2, Database, Layers, ArrowUpRight, Rocket, ShieldCheck,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { z } from "zod";
