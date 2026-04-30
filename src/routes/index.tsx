@@ -5,11 +5,13 @@ import {
   Megaphone, Workflow, LineChart, Package, FileSpreadsheet,
   ShoppingCart, MapPin, Briefcase, Send, MessageCircle, Phone,
   Star, Quote, CheckCircle2, AlertCircle, ChevronDown, TrendingUp, RotateCcw,
+  Code2, Database, Layers, ArrowUpRight, Rocket, ShieldCheck,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import portrait from "@/assets/khalid-portrait.png";
 import dashboard from "@/assets/dashboard-mockup.jpg";
+import AIChatWidget from "@/components/AIChatWidget";
 
 const PAGE_TITLE = "المهندس خالد الشريف — أتمتة التسويق والنمو";
 const PAGE_DESC = "متخصص في بناء أنظمة الأتمتة وإدارة الحملات الإعلانية الذكية للسوق السعودي. ندمج التقنية بالتسويق لأتمتة نمو أعمالكم.";
@@ -77,10 +79,11 @@ function smoothScrollTo(id: string) {
 function Nav() {
   const links = [
     { id: "about", label: "من أنا" },
-    { id: "product", label: "النظام" },
+    { id: "skills", label: "المهارات" },
     { id: "services", label: "الخدمات" },
-    { id: "testimonials", label: "آراء العملاء" },
-    { id: "faq", label: "أسئلة شائعة" },
+    { id: "portfolio", label: "أعمالي" },
+    { id: "testimonials", label: "العملاء" },
+    { id: "faq", label: "أسئلة" },
     { id: "contact", label: "تواصل" },
   ];
   return (
@@ -277,20 +280,80 @@ function Services() {
     {
       icon: Megaphone,
       title: "إدارة الحملات الإعلانية",
-      desc: "حملات احترافية على Snapchat و TikTok مصممة للسوق السعودي بنتائج قابلة للقياس.",
-      tags: ["Snapchat Ads", "TikTok Ads", "تحسين ROAS"],
+      desc: "حملات احترافية على Snapchat و TikTok مصممة للسوق السعودي بنتائج قابلة للقياس وتقارير شفافة.",
+      features: [
+        "بحث جمهور واستهداف دقيق للسوق السعودي",
+        "تصميم Creatives جاذبة (صور / فيديو)",
+        "تحسين ROAS وخفض تكلفة التحويل",
+        "تقارير أسبوعية + Dashboard حي",
+      ],
+      tags: ["Snapchat Ads", "TikTok Ads", "Meta Ads", "تحسين ROAS"],
+      gradient: "from-rose-500/20 to-amber-500/20",
     },
     {
       icon: Workflow,
       title: "بناء أنظمة الأتمتة المخصصة",
-      desc: "تصميم وتطوير حلول أوتوماتيكية ذكية تربط أنظمتك وتختصر ساعات من العمل اليدوي.",
-      tags: ["Make / Zapier", "أتمتة CRM", "ربط APIs"],
+      desc: "تصميم وتطوير حلول أوتوماتيكية ذكية تربط أنظمتك وتختصر ساعات من العمل اليدوي يومياً.",
+      features: [
+        "ربط CRM مع البريد والواتساب وSheets",
+        "أتمتة الفواتير والتقارير المتكررة",
+        "Workflows متقدمة على Make / n8n / Zapier",
+        "تكامل مع APIs مخصصة",
+      ],
+      tags: ["Make", "n8n", "Zapier", "REST APIs"],
+      gradient: "from-cyan-500/20 to-blue-500/20",
     },
     {
       icon: LineChart,
       title: "تحليل البيانات ولوحات الأداء",
-      desc: "بناء Dashboards تفاعلية تحوّل بيانات أعمالك إلى قرارات استراتيجية سريعة.",
-      tags: ["Looker Studio", "Power BI", "KPI تتبع"],
+      desc: "بناء Dashboards تفاعلية تحوّل بيانات أعمالك المبعثرة إلى قرارات استراتيجية سريعة.",
+      features: [
+        "ربط مصادر متعددة (DB, Sheets, Ads)",
+        "KPIs مخصصة لكل قسم",
+        "تنبيهات تلقائية عند الانحراف",
+        "تقارير قابلة للتصدير PDF/Excel",
+      ],
+      tags: ["Looker Studio", "Power BI", "Metabase"],
+      gradient: "from-emerald-500/20 to-cyan-500/20",
+    },
+    {
+      icon: Code2,
+      title: "تطوير أنظمة SaaS مخصصة",
+      desc: "تصميم وبناء منصات سحابية متكاملة لإدارة عمليات شركتك من الصفر إلى الإطلاق.",
+      features: [
+        "Frontend حديث (React + Tailwind)",
+        "Backend موثوق وقاعدة بيانات قابلة للتوسع",
+        "نظام صلاحيات وأدوار متعدد",
+        "نشر على البنية السحابية",
+      ],
+      tags: ["React", "Node.js", "PostgreSQL", "Cloud"],
+      gradient: "from-violet-500/20 to-fuchsia-500/20",
+    },
+    {
+      icon: ShieldCheck,
+      title: "استشارات تقنية وتدقيق",
+      desc: "مراجعة بنيتك التقنية الحالية واقتراح تحسينات لزيادة الكفاءة وخفض التكاليف.",
+      features: [
+        "تدقيق العمليات والاختناقات",
+        "خارطة طريق رقمية واضحة",
+        "اختيار الأدوات الأنسب لميزانيتك",
+        "تدريب الفريق على الأنظمة الجديدة",
+      ],
+      tags: ["Audit", "Strategy", "Training"],
+      gradient: "from-amber-500/20 to-orange-500/20",
+    },
+    {
+      icon: Rocket,
+      title: "إطلاق ونمو المنتجات الرقمية",
+      desc: "خطة إطلاق متكاملة من الـ MVP حتى أول 1000 عميل بأدوات Growth Hacking مدروسة.",
+      features: [
+        "صفحات هبوط محسّنة للتحويل",
+        "Funnels إعلانية مع Retargeting",
+        "أتمتة Onboarding للمستخدمين",
+        "تتبع التحويلات والأحداث",
+      ],
+      tags: ["Landing Pages", "GA4", "Funnels"],
+      gradient: "from-sky-500/20 to-indigo-500/20",
     },
   ];
   return (
@@ -299,30 +362,238 @@ function Services() {
         <motion.div initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeUp} className="max-w-3xl">
           <span className="text-primary text-sm font-bold">_ خدماتنا</span>
           <h2 className="font-display text-3xl sm:text-5xl mt-3">حلول مصممة <span className="text-gradient-cyan">لتنمو أعمالك</span></h2>
+          <p className="mt-4 text-muted-foreground">باقة كاملة من الخدمات التقنية والتسويقية تحت سقف واحد — من الفكرة حتى التنفيذ والقياس.</p>
         </motion.div>
-        <div className="mt-14 grid md:grid-cols-3 gap-6">
+        <div className="mt-14 grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {services.map((s, i) => (
             <motion.div
               key={s.title}
               initial="hidden" whileInView="show" viewport={{ once: true }}
-              variants={fadeUp} transition={{ delay: i * 0.1 }}
-              className="relative glass-strong rounded-3xl p-7 group hover:-translate-y-2 transition duration-500"
+              variants={fadeUp} transition={{ delay: i * 0.06 }}
+              className="relative glass-strong rounded-3xl p-7 group hover:-translate-y-2 transition duration-500 overflow-hidden"
             >
-              <div className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition duration-500" style={{ background: "var(--gradient-card)" }} />
+              <div className={`absolute -top-20 -right-20 h-48 w-48 rounded-full bg-gradient-to-br ${s.gradient} blur-3xl opacity-0 group-hover:opacity-100 transition duration-700`} />
               <div className="relative">
                 <div className="h-14 w-14 rounded-2xl bg-primary/10 border border-primary/20 grid place-items-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition">
                   <s.icon className="h-7 w-7" />
                 </div>
-                <h3 className="mt-6 font-display text-2xl">{s.title}</h3>
-                <p className="mt-3 text-muted-foreground leading-relaxed">{s.desc}</p>
-                <div className="mt-5 flex flex-wrap gap-2">
+                <h3 className="mt-6 font-display text-xl">{s.title}</h3>
+                <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
+                <ul className="mt-4 space-y-2">
+                  {s.features.map(f => (
+                    <li key={f} className="flex items-start gap-2 text-xs text-foreground/85">
+                      <CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                      <span>{f}</span>
+                    </li>
+                  ))}
+                </ul>
+                <div className="mt-5 flex flex-wrap gap-1.5">
                   {s.tags.map(t => (
-                    <span key={t} className="text-xs px-3 py-1 rounded-full bg-secondary/50 text-muted-foreground border border-border">{t}</span>
+                    <span key={t} className="text-[11px] px-2.5 py-1 rounded-full bg-secondary/50 text-muted-foreground border border-border">{t}</span>
                   ))}
                 </div>
               </div>
             </motion.div>
           ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Skills() {
+  const groups = [
+    {
+      icon: Workflow,
+      title: "أتمتة وتكاملات",
+      items: ["Make (Integromat)", "n8n", "Zapier", "Webhooks", "REST APIs", "GraphQL"],
+    },
+    {
+      icon: Megaphone,
+      title: "إعلانات رقمية",
+      items: ["Snapchat Ads", "TikTok Ads", "Meta Ads", "Google Ads", "GA4 / GTM", "Pixel Setup"],
+    },
+    {
+      icon: Code2,
+      title: "تطوير المنتجات",
+      items: ["React / Next.js", "TypeScript", "Tailwind CSS", "Node.js", "TanStack", "Vite"],
+    },
+    {
+      icon: Database,
+      title: "قواعد البيانات والسحابة",
+      items: ["PostgreSQL", "Supabase", "Firebase", "Cloudflare", "Vercel", "Edge Functions"],
+    },
+    {
+      icon: BarChart3,
+      title: "تحليل بيانات",
+      items: ["Looker Studio", "Power BI", "Metabase", "SQL", "Sheets المتقدم", "Dashboards"],
+    },
+    {
+      icon: Bot,
+      title: "ذكاء اصطناعي",
+      items: ["OpenAI / Gemini", "Prompt Engineering", "RAG", "AI Agents", "Embeddings", "Automation AI"],
+    },
+  ];
+  return (
+    <section id="skills" className="relative py-24 scroll-mt-24">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+        <motion.div initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeUp} className="text-center max-w-3xl mx-auto">
+          <span className="text-primary text-sm font-bold">_ المهارات والخبرات</span>
+          <h2 className="font-display text-3xl sm:text-5xl mt-3">
+            مكدّس <span className="text-gradient-cyan">تقني متكامل</span> لأي تحدي رقمي
+          </h2>
+          <p className="mt-4 text-muted-foreground">أعمل على أحدث الأدوات والتقنيات لأقدّم حلولاً موثوقة وقابلة للتوسع.</p>
+        </motion.div>
+
+        <div className="mt-14 grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {groups.map((g, i) => (
+            <motion.div
+              key={g.title}
+              initial="hidden" whileInView="show" viewport={{ once: true }}
+              variants={fadeUp} transition={{ delay: i * 0.06 }}
+              className="glass rounded-2xl p-6 hover:border-primary/30 transition group"
+            >
+              <div className="flex items-center gap-3">
+                <div className="h-11 w-11 rounded-xl bg-[image:var(--gradient-cyan)] grid place-items-center text-background group-hover:scale-110 transition">
+                  <g.icon className="h-5 w-5" />
+                </div>
+                <h3 className="font-display text-lg">{g.title}</h3>
+              </div>
+              <div className="mt-5 flex flex-wrap gap-1.5">
+                {g.items.map(it => (
+                  <span key={it} className="text-xs px-3 py-1.5 rounded-lg bg-secondary/40 border border-border text-foreground/85 hover:border-primary/40 hover:text-primary transition cursor-default">
+                    {it}
+                  </span>
+                ))}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Portfolio() {
+  const projects = [
+    {
+      title: "نظام SaaS لإدارة المتاجر",
+      category: "منصة سحابية",
+      desc: "منصة متكاملة تدير المبيعات والمخزون والتقارير في مكان واحد، مع أتمتة كاملة للعمليات اليومية.",
+      tech: ["React", "Node.js", "PostgreSQL", "Cloudflare"],
+      metrics: [{ k: "70%", v: "توفير وقت" }, { k: "+200", v: "متجر مستفيد" }],
+      icon: Layers,
+      accent: "from-cyan-500/30 to-blue-500/30",
+    },
+    {
+      title: "أتمتة فريق المبيعات",
+      category: "Workflow Automation",
+      desc: "ربط CRM مع WhatsApp Business والبريد لإرسال متابعات تلقائية وتسجيل العملاء بدون تدخل يدوي.",
+      tech: ["n8n", "HubSpot", "WhatsApp API"],
+      metrics: [{ k: "12h/يوم", v: "وقت موفّر" }, { k: "+45%", v: "معدل المتابعة" }],
+      icon: Workflow,
+      accent: "from-emerald-500/30 to-cyan-500/30",
+    },
+    {
+      title: "حملة إطلاق براند تجميل",
+      category: "Snapchat & TikTok Ads",
+      desc: "حملة متكاملة لإطلاق منتج جديد في السوق السعودي بميزانية محسوبة ونتائج فاقت المستهدف.",
+      tech: ["Snapchat Ads", "TikTok", "GA4"],
+      metrics: [{ k: "4.6x", v: "ROAS" }, { k: "-38%", v: "تكلفة التحويل" }],
+      icon: Megaphone,
+      accent: "from-rose-500/30 to-amber-500/30",
+    },
+    {
+      title: "Dashboard تنفيذي شامل",
+      category: "Data Analytics",
+      desc: "لوحة قياس تنفيذية تجمع بيانات المبيعات والإعلانات والمخزون من 6 مصادر مختلفة في عرض واحد.",
+      tech: ["Looker Studio", "BigQuery", "Sheets"],
+      metrics: [{ k: "6→1", v: "مصادر موحّدة" }, { k: "حي", v: "تحديث لحظي" }],
+      icon: BarChart3,
+      accent: "from-violet-500/30 to-fuchsia-500/30",
+    },
+    {
+      title: "نظام حجوزات ذكي",
+      category: "Custom Web App",
+      desc: "تطبيق حجوزات مع تأكيد تلقائي عبر SMS والبريد، ولوحة تحكم لإدارة المواعيد والعملاء.",
+      tech: ["Next.js", "Supabase", "Twilio"],
+      metrics: [{ k: "24/7", v: "حجز ذاتي" }, { k: "0", v: "أخطاء بشرية" }],
+      icon: Rocket,
+      accent: "from-sky-500/30 to-indigo-500/30",
+    },
+    {
+      title: "وكيل AI لخدمة العملاء",
+      category: "AI Agent",
+      desc: "وكيل ذكاء اصطناعي يجاوب على استفسارات العملاء على الموقع والواتساب باللهجة السعودية.",
+      tech: ["Gemini", "RAG", "Vector DB"],
+      metrics: [{ k: "82%", v: "معدل الحل" }, { k: "<3s", v: "زمن الرد" }],
+      icon: Bot,
+      accent: "from-amber-500/30 to-orange-500/30",
+    },
+  ];
+  return (
+    <section id="portfolio" className="relative py-24 scroll-mt-24">
+      <div className="absolute inset-0 grid-bg opacity-20 [mask-image:radial-gradient(ellipse_at_center,black,transparent_70%)]" />
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
+        <motion.div initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeUp} className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5">
+          <div className="max-w-2xl">
+            <span className="text-primary text-sm font-bold">_ معرض الأعمال</span>
+            <h2 className="font-display text-3xl sm:text-5xl mt-3">
+              مشاريع <span className="text-gradient-cyan">حقيقية</span>، نتائج ملموسة
+            </h2>
+            <p className="mt-4 text-muted-foreground">عينة من المشاريع التي نفّذتها في مجالات الأتمتة والتطوير والإعلانات الرقمية.</p>
+          </div>
+          <button onClick={() => smoothScrollTo("contact")} className="hidden sm:inline-flex items-center gap-2 glass-strong rounded-xl px-5 py-3 font-bold hover:border-primary/40 transition self-start sm:self-auto">
+            ابدأ مشروعك
+            <ArrowUpRight className="h-4 w-4" />
+          </button>
+        </motion.div>
+
+        <div className="mt-14 grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {projects.map((p, i) => (
+            <motion.article
+              key={p.title}
+              initial="hidden" whileInView="show" viewport={{ once: true }}
+              variants={fadeUp} transition={{ delay: i * 0.06 }}
+              className="group relative glass-strong rounded-3xl overflow-hidden hover:-translate-y-2 transition duration-500"
+            >
+              {/* Visual header */}
+              <div className={`relative h-44 overflow-hidden bg-gradient-to-br ${p.accent}`}>
+                <div className="absolute inset-0 grid-bg opacity-30" />
+                <div className="absolute inset-0 grid place-items-center">
+                  <p.icon className="h-16 w-16 text-foreground/80 group-hover:scale-110 group-hover:rotate-6 transition duration-500" strokeWidth={1.2} />
+                </div>
+                <div className="absolute top-4 right-4 glass rounded-full px-3 py-1 text-[11px] font-bold">
+                  {p.category}
+                </div>
+              </div>
+
+              {/* Body */}
+              <div className="p-6">
+                <h3 className="font-display text-lg leading-snug">{p.title}</h3>
+                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{p.desc}</p>
+
+                <div className="mt-4 grid grid-cols-2 gap-2">
+                  {p.metrics.map(m => (
+                    <div key={m.v} className="glass rounded-xl p-2.5 text-center">
+                      <div className="font-display text-base text-gradient-cyan">{m.k}</div>
+                      <div className="text-[10px] text-muted-foreground mt-0.5">{m.v}</div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-4 flex flex-wrap gap-1.5">
+                  {p.tech.map(t => (
+                    <span key={t} className="text-[10px] px-2 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20">{t}</span>
+                  ))}
+                </div>
+              </div>
+            </motion.article>
+          ))}
+        </div>
+
+        <div className="mt-12 text-center text-xs text-muted-foreground">
+          * بعض الأعمال خاصة وتم إخفاء أسماء العملاء حفاظاً على السرية.
         </div>
       </div>
     </section>
@@ -743,20 +1014,34 @@ function Footer() {
   );
 }
 
+function AnimatedBackground() {
+  return (
+    <div className="bg-aurora" aria-hidden="true">
+      <span className="blob" />
+      <span className="grid" />
+      <span className="noise" />
+    </div>
+  );
+}
+
 function Index() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen relative">
+      <AnimatedBackground />
       <Nav />
       <main>
         <Hero />
         <About />
+        <Skills />
         <Product />
         <Services />
+        <Portfolio />
         <Testimonials />
         <FAQ />
         <Contact />
       </main>
       <Footer />
+      <AIChatWidget />
     </div>
   );
 }
