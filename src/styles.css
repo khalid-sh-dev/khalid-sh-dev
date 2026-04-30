@@ -123,17 +123,18 @@
 }
 
 /* ===== Animated background system ===== */
+/* Slower + GPU-friendly transforms only. Reduced motion fully disables animation. */
 @keyframes aurora-1 {
   0%, 100% { transform: translate3d(0,0,0) scale(1); }
-  50% { transform: translate3d(8%, -6%, 0) scale(1.15); }
+  50% { transform: translate3d(6%, -4%, 0) scale(1.08); }
 }
 @keyframes aurora-2 {
-  0%, 100% { transform: translate3d(0,0,0) scale(1.05); }
-  50% { transform: translate3d(-10%, 8%, 0) scale(0.95); }
+  0%, 100% { transform: translate3d(0,0,0) scale(1.04); }
+  50% { transform: translate3d(-7%, 6%, 0) scale(0.97); }
 }
 @keyframes aurora-3 {
   0%, 100% { transform: translate3d(0,0,0) scale(1); }
-  50% { transform: translate3d(6%, 10%, 0) scale(1.1); }
+  50% { transform: translate3d(4%, 7%, 0) scale(1.06); }
 }
 @keyframes grid-pan {
   from { background-position: 0 0; }
@@ -156,6 +157,7 @@
   overflow: hidden;
   background:
     radial-gradient(ellipse at top, oklch(0.22 0.06 250) 0%, oklch(0.16 0.04 258) 60%);
+  contain: strict;
 }
 .bg-aurora ~ * { position: relative; z-index: 1; }
 .bg-aurora::before,
@@ -166,24 +168,26 @@
   border-radius: 50%;
   filter: blur(90px);
   will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 .bg-aurora::before {
   width: 50vw; height: 50vw;
   top: -10vw; right: -10vw;
-  background: radial-gradient(circle, oklch(0.78 0.22 200 / 0.35), transparent 65%);
-  animation: aurora-1 18s ease-in-out infinite;
+  background: radial-gradient(circle, oklch(0.78 0.22 200 / 0.32), transparent 65%);
+  animation: aurora-1 38s ease-in-out infinite;
 }
 .bg-aurora::after {
   width: 55vw; height: 55vw;
   bottom: -15vw; left: -10vw;
-  background: radial-gradient(circle, oklch(0.55 0.22 280 / 0.32), transparent 65%);
-  animation: aurora-2 22s ease-in-out infinite;
+  background: radial-gradient(circle, oklch(0.55 0.22 280 / 0.28), transparent 65%);
+  animation: aurora-2 46s ease-in-out infinite;
 }
 .bg-aurora .blob {
   width: 40vw; height: 40vw;
   top: 30%; left: 30%;
-  background: radial-gradient(circle, oklch(0.7 0.2 220 / 0.28), transparent 65%);
-  animation: aurora-3 26s ease-in-out infinite;
+  background: radial-gradient(circle, oklch(0.7 0.2 220 / 0.25), transparent 65%);
+  animation: aurora-3 54s ease-in-out infinite;
 }
 .bg-aurora .grid {
   position: absolute;
@@ -202,7 +206,28 @@
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
+/* On small screens drop the blur to ease GPU load */
+@media (max-width: 640px) {
+  .bg-aurora::before,
+  .bg-aurora::after,
+  .bg-aurora > .blob {
+    filter: blur(60px);
+  }
+  .bg-aurora > .blob { display: none; }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .bg-aurora::before, .bg-aurora::after, .bg-aurora .blob,
-  .grid-bg-animated { animation: none !important; }
+  .bg-aurora::before,
+  .bg-aurora::after,
+  .bg-aurora .blob,
+  .grid-bg-animated {
+    animation: none !important;
+  }
+  /* Disable all motion globally for users who prefer it */
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
