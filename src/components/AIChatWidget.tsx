@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, X, Send, Bot, Loader2 } from "lucide-react";
+import { Sparkles, X, Send, Bot, Loader2, MessageSquare, User } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 type Msg = { role: "user" | "assistant"; content: string };
+type LiveMsg = { id: string; sender: "user" | "admin"; content: string; created_at: string };
 
 const STARTERS = [
   "ما الخدمات اللي تقدّمها؟",
@@ -12,24 +13,87 @@ const STARTERS = [
   "أبغى عرض سعر لمشروعي",
 ];
 
+const VISITOR_ID_KEY = "khalid_visitor_id";
+const CONVO_ID_KEY = "khalid_convo_id";
+const VISITOR_NAME_KEY = "khalid_visitor_name";
+
+function getOrCreateVisitorId(): string {
+  if (typeof window === "undefined") return "";
+  let v = localStorage.getItem(VISITOR_ID_KEY);
+  if (!v) {
+    v = crypto.randomUUID();
+    localStorage.setItem(VISITOR_ID_KEY, v);
+  }
+  return v;
+}
+
 export default function AIChatWidget() {
   const [open, setOpen] = useState(false);
+  const [tab, setTab] = useState<"ai" | "live">("ai");
+
+  // AI tab state
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([
     {
       role: "assistant",
       content:
-        "أهلاً! 👋 أنا المساعد الذكي للمهندس خالد. اسألني عن الخدمات، الأتمتة، الحملات الإعلانية، أو أي تفاصيل عن مشروعك.",
+        "أهلاً! 👋 أنا المساعد الذكي للمهندس خالد. اسألني عن الخدمات، الأتمتة، الحملات الإعلانية، أو أي تفاصيل عن مشروعك. وللتواصل المباشر مع خالد اضغط على تبويب \"دردشة مباشرة\".",
     },
   ]);
+
+  // Live chat state
+  const [liveInput, setLiveInput] = useState("");
+  const [liveMsgs, setLiveMsgs] = useState<LiveMsg[]>([]);
+  const [liveLoading, setLiveLoading] = useState(false);
+  const [convoId, setConvoId] = useState<string | null>(null);
+  const [name, setName] = useState("");
+  const [needsName, setNeedsName] = useState(true);
+
   const scrollerRef = useRef<HTMLDivElement>(null);
+  const liveScrollerRef = useRef<HTMLDivElement>(null);
 
+  // Init visitor / load existing convo
   useEffect(() => {
-    scrollerRef.current?.scrollTo({ top: 9e9, behavior: "smooth" });
-  }, [messages, loading, open]);
+    if (typeof window === "undefined") return;
+    getOrCreateVisitorId();
+    const savedName = localStorage.getItem(VISITOR_NAME_KEY) || "";
+    if (savedName) { setName(savedName); setNeedsName(false); }
+    const savedConvo = localStorage.getItem(CONVO_ID_KEY);
+    if (savedConvo) { setConvoId(savedConvo); }
+  }, []);
 
-  async function send(text: string) {
+  // Load messages when convo opens
+  useEffect(() => {
+    if (!convoId) return;
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("messages")
+        .select("id,sender,content,created_at")
+        .eq("conversation_id", convoId)
+        .order("created_at", { ascending: true });
+      if (!cancelled && data) setLiveMsgs(data as LiveMsg[]);
+    })();
+    // realtime subscription
+    const channel = supabase
+      .channel(`convo-${convoId}`)
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages", filter: `conversation_id=eq.${convoId}` },
+        (payload) => {
+          setLiveMsgs(m => {
+            const newMsg = payload.new as LiveMsg;
+            if (m.some(x => x.id === newMsg.id)) return m;
+            return [...m, newMsg];
+          });
+        })
+      .subscribe();
+    return () => { cancelled = true; supabase.removeChannel(channel); };
+  }, [convoId]);
+
+  useEffect(() => { scrollerRef.current?.scrollTo({ top: 9e9, behavior: "smooth" }); }, [messages, loading, open]);
+  useEffect(() => { liveScrollerRef.current?.scrollTo({ top: 9e9, behavior: "smooth" }); }, [liveMsgs, liveLoading, tab]);
+
+  async function sendAI(text: string) {
     const trimmed = text.trim();
     if (!trimmed || loading) return;
     const next: Msg[] = [...messages, { role: "user", content: trimmed }];
@@ -47,24 +111,53 @@ export default function AIChatWidget() {
       setMessages(m => [...m, { role: "assistant", content: reply }]);
     } catch (e) {
       console.error(e);
-      setMessages(m => [
-        ...m,
-        { role: "assistant", content: "حصل خلل بالاتصال. جرّب لاحقاً أو راسلني عبر النموذج." },
-      ]);
-    } finally {
-      setLoading(false);
-    }
+      setMessages(m => [...m, { role: "assistant", content: "حصل خلل بالاتصال. جرّب لاحقاً أو راسلني عبر النموذج." }]);
+    } finally { setLoading(false); }
+  }
+
+  async function sendLive(text: string) {
+    const trimmed = text.trim();
+    if (!trimmed || liveLoading) return;
+    if (needsName) return;
+    setLiveLoading(true);
+    try {
+      const visitorId = getOrCreateVisitorId();
+      const { data, error } = await supabase.functions.invoke("chat-send", {
+        body: {
+          visitor_id: visitorId,
+          conversation_id: convoId,
+          visitor_name: name || null,
+          content: trimmed,
+        },
+      });
+      if (error) throw error;
+      const newConvoId = (data as { conversation_id?: string })?.conversation_id;
+      if (newConvoId && newConvoId !== convoId) {
+        setConvoId(newConvoId);
+        localStorage.setItem(CONVO_ID_KEY, newConvoId);
+      }
+      setLiveInput("");
+    } catch (e) {
+      console.error(e);
+    } finally { setLiveLoading(false); }
+  }
+
+  function saveName(e: React.FormEvent) {
+    e.preventDefault();
+    const t = name.trim();
+    if (t.length < 2) return;
+    localStorage.setItem(VISITOR_NAME_KEY, t);
+    setNeedsName(false);
   }
 
   return (
     <>
-      {/* Floating button */}
       <motion.button
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 1.2, type: "spring", stiffness: 200, damping: 18 }}
         onClick={() => setOpen(o => !o)}
-        aria-label="مساعد الذكاء الاصطناعي"
+        aria-label="مساعد ودردشة مباشرة"
         className="fixed bottom-5 left-5 sm:bottom-6 sm:left-6 z-[60] h-14 w-14 sm:h-16 sm:w-16 rounded-full grid place-items-center text-background shadow-2xl glow-cyan hover:scale-105 active:scale-95 transition"
         style={{ background: "var(--gradient-cyan)" }}
       >
@@ -82,20 +175,14 @@ export default function AIChatWidget() {
         </AnimatePresence>
       </motion.button>
 
-      {/* Hint label */}
       {!open && (
-        <motion.div
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 1.6 }}
-          className="hidden sm:flex fixed bottom-9 left-24 z-[60] glass-strong rounded-full px-3 py-1.5 text-xs items-center gap-1.5 pointer-events-none"
-        >
+        <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 1.6 }}
+          className="hidden sm:flex fixed bottom-9 left-24 z-[60] glass-strong rounded-full px-3 py-1.5 text-xs items-center gap-1.5 pointer-events-none">
           <Bot className="h-3.5 w-3.5 text-primary" />
-          مساعد ذكي
+          ذكاء + دردشة
         </motion.div>
       )}
 
-      {/* Panel */}
       <AnimatePresence>
         {open && (
           <motion.div
@@ -104,9 +191,9 @@ export default function AIChatWidget() {
             exit={{ opacity: 0, y: 20, scale: 0.96 }}
             transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
             className="fixed bottom-24 left-2 right-2 sm:left-6 sm:right-auto z-[59] sm:w-[400px] max-w-[calc(100vw-1rem)] glass-strong rounded-3xl shadow-2xl flex flex-col overflow-hidden"
-            style={{ height: "min(560px, calc(100vh - 8rem))" }}
+            style={{ height: "min(580px, calc(100vh - 8rem))" }}
             role="dialog"
-            aria-label="نافذة المساعد الذكي"
+            aria-label="نافذة الدردشة"
           >
             {/* Header */}
             <div className="px-5 py-4 border-b border-border/50 flex items-center gap-3" style={{ background: "var(--gradient-card)" }}>
@@ -117,78 +204,125 @@ export default function AIChatWidget() {
                 <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-400 border-2 border-background" />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="font-bold text-sm">المساعد الذكي</div>
-                <div className="text-[11px] text-muted-foreground">يجيب عن استفساراتك فوراً · مدعوم بالذكاء الاصطناعي</div>
+                <div className="font-bold text-sm">دردشة المهندس خالد</div>
+                <div className="text-[11px] text-muted-foreground">رد فوري بالذكاء الاصطناعي · أو راسل خالد مباشرة</div>
               </div>
             </div>
 
-            {/* Messages */}
-            <div ref={scrollerRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
-              {messages.map((m, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className={`flex ${m.role === "user" ? "justify-start" : "justify-end"}`}
-                >
-                  <div
-                    className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap ${
-                      m.role === "user"
-                        ? "bg-primary text-primary-foreground rounded-br-sm"
-                        : "glass border border-border/60 rounded-bl-sm"
-                    }`}
-                  >
-                    {m.content}
-                  </div>
-                </motion.div>
-              ))}
-              {loading && (
-                <div className="flex justify-end">
-                  <div className="glass rounded-2xl px-4 py-3 flex items-center gap-2 text-xs text-muted-foreground">
-                    <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
-                    يكتب الرد...
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Quick starters */}
-            {messages.length <= 1 && !loading && (
-              <div className="px-4 pb-2 flex flex-wrap gap-1.5">
-                {STARTERS.map(s => (
-                  <button
-                    key={s}
-                    onClick={() => send(s)}
-                    className="text-[11px] px-2.5 py-1 rounded-full glass hover:border-primary/40 transition"
-                  >
-                    {s}
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {/* Input */}
-            <form
-              onSubmit={(e) => { e.preventDefault(); send(input); }}
-              className="p-3 border-t border-border/50 flex items-center gap-2"
-            >
-              <input
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="اكتب سؤالك هنا..."
-                className="flex-1 bg-input border border-border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-primary transition"
-                disabled={loading}
-              />
+            {/* Tabs */}
+            <div className="flex border-b border-border/50">
               <button
-                type="submit"
-                disabled={loading || !input.trim()}
-                aria-label="إرسال"
-                className="h-10 w-10 grid place-items-center rounded-xl text-background disabled:opacity-50 hover:scale-105 active:scale-95 transition"
-                style={{ background: "var(--gradient-cyan)" }}
+                onClick={() => setTab("ai")}
+                className={`flex-1 py-2.5 text-xs font-bold flex items-center justify-center gap-1.5 transition ${tab === "ai" ? "text-primary border-b-2 border-primary" : "text-muted-foreground hover:text-foreground"}`}
               >
-                <Send className="h-4 w-4" />
+                <Sparkles className="h-3.5 w-3.5" />
+                مساعد ذكي
               </button>
-            </form>
+              <button
+                onClick={() => setTab("live")}
+                className={`flex-1 py-2.5 text-xs font-bold flex items-center justify-center gap-1.5 transition ${tab === "live" ? "text-primary border-b-2 border-primary" : "text-muted-foreground hover:text-foreground"}`}
+              >
+                <MessageSquare className="h-3.5 w-3.5" />
+                دردشة مباشرة
+              </button>
+            </div>
+
+            {tab === "ai" ? (
+              <>
+                <div ref={scrollerRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
+                  {messages.map((m, i) => (
+                    <motion.div key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+                      className={`flex ${m.role === "user" ? "justify-start" : "justify-end"}`}>
+                      <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap ${m.role === "user" ? "bg-primary text-primary-foreground rounded-br-sm" : "glass border border-border/60 rounded-bl-sm"}`}>
+                        {m.content}
+                      </div>
+                    </motion.div>
+                  ))}
+                  {loading && (
+                    <div className="flex justify-end">
+                      <div className="glass rounded-2xl px-4 py-3 flex items-center gap-2 text-xs text-muted-foreground">
+                        <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
+                        يكتب الرد...
+                      </div>
+                    </div>
+                  )}
+                </div>
+                {messages.length <= 1 && !loading && (
+                  <div className="px-4 pb-2 flex flex-wrap gap-1.5">
+                    {STARTERS.map(s => (
+                      <button key={s} onClick={() => sendAI(s)} className="text-[11px] px-2.5 py-1 rounded-full glass hover:border-primary/40 transition">
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <form onSubmit={(e) => { e.preventDefault(); sendAI(input); }} className="p-3 border-t border-border/50 flex items-center gap-2">
+                  <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="اكتب سؤالك هنا..."
+                    className="flex-1 bg-input border border-border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-primary transition" disabled={loading} />
+                  <button type="submit" disabled={loading || !input.trim()} aria-label="إرسال"
+                    className="h-10 w-10 grid place-items-center rounded-xl text-background disabled:opacity-50 hover:scale-105 active:scale-95 transition" style={{ background: "var(--gradient-cyan)" }}>
+                    <Send className="h-4 w-4" />
+                  </button>
+                </form>
+              </>
+            ) : (
+              <>
+                {needsName ? (
+                  <form onSubmit={saveName} className="flex-1 flex flex-col items-center justify-center px-6 gap-4 text-center">
+                    <div className="h-14 w-14 rounded-2xl grid place-items-center text-background" style={{ background: "var(--gradient-cyan)" }}>
+                      <User className="h-7 w-7" />
+                    </div>
+                    <div>
+                      <div className="font-bold">قبل ما نبدأ الدردشة</div>
+                      <div className="text-xs text-muted-foreground mt-1">اكتب اسمك حتى يقدر خالد يرد عليك بشكل شخصي.</div>
+                    </div>
+                    <input value={name} onChange={(e) => setName(e.target.value)} placeholder="اسمك الكريم" autoFocus
+                      className="w-full bg-input border border-border rounded-xl px-3 py-2.5 text-sm text-center focus:outline-none focus:border-primary" />
+                    <button type="submit" disabled={name.trim().length < 2}
+                      className="w-full rounded-xl text-background py-2.5 font-bold disabled:opacity-50 hover:scale-[1.02] active:scale-95 transition"
+                      style={{ background: "var(--gradient-cyan)" }}>
+                      ابدأ الدردشة
+                    </button>
+                  </form>
+                ) : (
+                  <>
+                    <div ref={liveScrollerRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
+                      {liveMsgs.length === 0 && (
+                        <div className="text-center text-xs text-muted-foreground py-8">
+                          مرحباً {name} 👋<br />
+                          ابدأ الدردشة وسيرد عليك خالد في أقرب وقت.
+                        </div>
+                      )}
+                      {liveMsgs.map((m) => (
+                        <motion.div key={m.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+                          className={`flex ${m.sender === "user" ? "justify-start" : "justify-end"}`}>
+                          <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap ${m.sender === "user" ? "bg-primary text-primary-foreground rounded-br-sm" : "glass border border-border/60 rounded-bl-sm"}`}>
+                            {m.sender === "admin" && <div className="text-[10px] font-bold text-primary mb-0.5">المهندس خالد</div>}
+                            {m.content}
+                          </div>
+                        </motion.div>
+                      ))}
+                      {liveLoading && (
+                        <div className="flex justify-start">
+                          <div className="glass rounded-2xl px-4 py-3 flex items-center gap-2 text-xs text-muted-foreground">
+                            <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
+                            جارٍ الإرسال...
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    <form onSubmit={(e) => { e.preventDefault(); sendLive(liveInput); }} className="p-3 border-t border-border/50 flex items-center gap-2">
+                      <input value={liveInput} onChange={(e) => setLiveInput(e.target.value)} placeholder="اكتب رسالتك لخالد..."
+                        className="flex-1 bg-input border border-border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-primary transition" disabled={liveLoading} />
+                      <button type="submit" disabled={liveLoading || !liveInput.trim()} aria-label="إرسال"
+                        className="h-10 w-10 grid place-items-center rounded-xl text-background disabled:opacity-50 hover:scale-105 active:scale-95 transition" style={{ background: "var(--gradient-cyan)" }}>
+                        <Send className="h-4 w-4" />
+                      </button>
+                    </form>
+                  </>
+                )}
+              </>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
