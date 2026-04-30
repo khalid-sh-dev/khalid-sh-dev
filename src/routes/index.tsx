@@ -5,11 +5,14 @@ import {
   Megaphone, Workflow, LineChart, Package, FileSpreadsheet,
   ShoppingCart, MapPin, Briefcase, Send, MessageCircle, Phone,
   Star, Quote, CheckCircle2, AlertCircle, ChevronDown, TrendingUp, RotateCcw,
+  Code2, Database, Globe, Zap, Target, Layers, Cpu, Palette,
+  ArrowUpRight, Settings2, Rocket, ShieldCheck,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import portrait from "@/assets/khalid-portrait.png";
 import dashboard from "@/assets/dashboard-mockup.jpg";
+import AIChatWidget from "@/components/AIChatWidget";
 
 const PAGE_TITLE = "المهندس خالد الشريف — أتمتة التسويق والنمو";
 const PAGE_DESC = "متخصص في بناء أنظمة الأتمتة وإدارة الحملات الإعلانية الذكية للسوق السعودي. ندمج التقنية بالتسويق لأتمتة نمو أعمالكم.";
