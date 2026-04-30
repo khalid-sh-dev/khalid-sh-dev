@@ -80,10 +80,11 @@ function smoothScrollTo(id: string) {
 function Nav() {
   const links = [
     { id: "about", label: "من أنا" },
-    { id: "product", label: "النظام" },
+    { id: "skills", label: "المهارات" },
     { id: "services", label: "الخدمات" },
-    { id: "testimonials", label: "آراء العملاء" },
-    { id: "faq", label: "أسئلة شائعة" },
+    { id: "portfolio", label: "أعمالي" },
+    { id: "testimonials", label: "العملاء" },
+    { id: "faq", label: "أسئلة" },
     { id: "contact", label: "تواصل" },
   ];
   return (
