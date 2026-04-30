@@ -113,4 +113,95 @@
       linear-gradient(90deg, oklch(0.82 0.18 210 / 0.06) 1px, transparent 1px);
     background-size: 60px 60px;
   }
+  .grid-bg-animated {
+    background-image:
+      linear-gradient(oklch(0.82 0.18 210 / 0.07) 1px, transparent 1px),
+      linear-gradient(90deg, oklch(0.82 0.18 210 / 0.07) 1px, transparent 1px);
+    background-size: 60px 60px;
+    animation: grid-pan 28s linear infinite;
+  }
+}
+
+/* ===== Animated background system ===== */
+@keyframes aurora-1 {
+  0%, 100% { transform: translate3d(0,0,0) scale(1); }
+  50% { transform: translate3d(8%, -6%, 0) scale(1.15); }
+}
+@keyframes aurora-2 {
+  0%, 100% { transform: translate3d(0,0,0) scale(1.05); }
+  50% { transform: translate3d(-10%, 8%, 0) scale(0.95); }
+}
+@keyframes aurora-3 {
+  0%, 100% { transform: translate3d(0,0,0) scale(1); }
+  50% { transform: translate3d(6%, 10%, 0) scale(1.1); }
+}
+@keyframes grid-pan {
+  from { background-position: 0 0; }
+  to { background-position: 60px 60px; }
+}
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+@keyframes pulse-soft {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+.bg-aurora {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at top, oklch(0.22 0.06 250) 0%, oklch(0.16 0.04 258) 60%);
+}
+.bg-aurora::before,
+.bg-aurora::after,
+.bg-aurora > .blob {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  will-change: transform;
+}
+.bg-aurora::before {
+  width: 50vw; height: 50vw;
+  top: -10vw; right: -10vw;
+  background: radial-gradient(circle, oklch(0.78 0.22 200 / 0.35), transparent 65%);
+  animation: aurora-1 18s ease-in-out infinite;
+}
+.bg-aurora::after {
+  width: 55vw; height: 55vw;
+  bottom: -15vw; left: -10vw;
+  background: radial-gradient(circle, oklch(0.55 0.22 280 / 0.32), transparent 65%);
+  animation: aurora-2 22s ease-in-out infinite;
+}
+.bg-aurora .blob {
+  width: 40vw; height: 40vw;
+  top: 30%; left: 30%;
+  background: radial-gradient(circle, oklch(0.7 0.2 220 / 0.28), transparent 65%);
+  animation: aurora-3 26s ease-in-out infinite;
+}
+.bg-aurora .grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(oklch(0.82 0.18 210 / 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, oklch(0.82 0.18 210 / 0.05) 1px, transparent 1px);
+  background-size: 70px 70px;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+}
+.bg-aurora .noise {
+  position: absolute;
+  inset: 0;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bg-aurora::before, .bg-aurora::after, .bg-aurora .blob,
+  .grid-bg-animated { animation: none !important; }
 }
