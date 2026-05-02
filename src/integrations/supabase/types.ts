@@ -114,44 +114,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      get_visitor_conversation: {
-        Args: { _conversation_id: string; _visitor_id: string }
-        Returns: {
-          archived_at: string | null
-          created_at: string
-          id: string
-          last_message_at: string
-          last_message_preview: string | null
-          status: string
-          unread_admin_count: number
-          unread_user_count: number
-          visitor_email: string | null
-          visitor_id: string
-          visitor_name: string | null
-        }[]
-        SetofOptions: {
-          from: "*"
-          to: "conversations"
-          isOneToOne: false
-          isSetofReturn: true
-        }
-      }
-      get_visitor_messages: {
-        Args: { _conversation_id: string; _visitor_id: string }
-        Returns: {
-          content: string
-          conversation_id: string
-          created_at: string
-          id: string
-          sender: string
-        }[]
-        SetofOptions: {
-          from: "*"
-          to: "messages"
-          isOneToOne: false
-          isSetofReturn: true
-        }
-      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
