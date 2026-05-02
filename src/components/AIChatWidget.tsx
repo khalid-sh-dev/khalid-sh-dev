@@ -315,8 +315,26 @@ export default function AIChatWidget() {
                   </form>
                 ) : (
                   <>
+                    {justSent && (
+                      <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
+                        className="mx-3 mt-3 rounded-2xl border border-emerald-400/30 bg-emerald-400/10 p-3 flex items-start gap-2.5">
+                        <CheckCircle2 className="h-5 w-5 text-emerald-400 shrink-0 mt-0.5" />
+                        <div className="flex-1 min-w-0">
+                          <div className="text-xs font-bold text-emerald-300">تم استلام رسالتك بنجاح</div>
+                          <div className="text-[11px] text-muted-foreground mt-0.5">سيتواصل خالد معك في أقرب وقت داخل نفس النافذة.</div>
+                          <div className="mt-2 flex items-center gap-1.5 text-[11px]">
+                            <Ticket className="h-3.5 w-3.5 text-primary" />
+                            <span className="text-muted-foreground">رقم تذكرتك:</span>
+                            <code className="font-bold text-primary tracking-wider">{justSent.ticket}</code>
+                          </div>
+                        </div>
+                        <button onClick={() => setJustSent(null)} className="text-muted-foreground hover:text-foreground" aria-label="إخفاء">
+                          <X className="h-4 w-4" />
+                        </button>
+                      </motion.div>
+                    )}
                     <div ref={liveScrollerRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
-                      {liveMsgs.length === 0 && (
+                      {liveMsgs.length === 0 && !justSent && (
                         <div className="text-center text-xs text-muted-foreground py-8">
                           مرحباً {name} 👋<br />
                           ابدأ الدردشة وسيرد عليك خالد في أقرب وقت.
