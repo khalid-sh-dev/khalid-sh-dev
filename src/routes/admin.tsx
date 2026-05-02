@@ -143,6 +143,8 @@ function NotAdmin({ userId }: { userId: string }) {
   );
 }
 
+type StatusFilter = "all" | "open" | "closed" | "archived";
+
 function Inbox() {
   const [convos, setConvos] = useState<Conversation[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -150,6 +152,8 @@ function Inbox() {
   const [reply, setReply] = useState("");
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("open");
   const scrollerRef = useRef<HTMLDivElement>(null);
 
   async function loadConvos() {
