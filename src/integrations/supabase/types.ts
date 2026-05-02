@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       conversations: {
         Row: {
+          archived_at: string | null
           created_at: string
           id: string
           last_message_at: string
@@ -28,6 +29,7 @@ export type Database = {
           visitor_name: string | null
         }
         Insert: {
+          archived_at?: string | null
           created_at?: string
           id?: string
           last_message_at?: string
@@ -40,6 +42,7 @@ export type Database = {
           visitor_name?: string | null
         }
         Update: {
+          archived_at?: string | null
           created_at?: string
           id?: string
           last_message_at?: string

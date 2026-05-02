@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, LogOut, Send, MessageSquare, Mail, ShieldAlert, RefreshCw } from "lucide-react";
+import { Loader2, LogOut, Send, MessageSquare, Mail, ShieldAlert, RefreshCw, Search, Archive, ArchiveRestore, Filter } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -22,6 +22,7 @@ type Conversation = {
   last_message_at: string;
   last_message_preview: string | null;
   unread_admin_count: number;
+  archived_at: string | null;
 };
 
 type Message = {
@@ -142,6 +143,8 @@ function NotAdmin({ userId }: { userId: string }) {
   );
 }
 
+type StatusFilter = "all" | "open" | "closed" | "archived";
+
 function Inbox() {
   const [convos, setConvos] = useState<Conversation[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -149,6 +152,8 @@ function Inbox() {
   const [reply, setReply] = useState("");
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("open");
   const scrollerRef = useRef<HTMLDivElement>(null);
 
   async function loadConvos() {
@@ -209,8 +214,46 @@ function Inbox() {
     } finally { setSending(false); }
   }
 
+  async function toggleArchive(c: Conversation) {
+    const next = c.archived_at ? null : new Date().toISOString();
+    const { error } = await supabase
+      .from("conversations")
+      .update({ archived_at: next, status: next ? "archived" : "open" })
+      .eq("id", c.id);
+    if (error) { alert("تعذّر تحديث الأرشفة: " + error.message); return; }
+    if (next && activeId === c.id) setActiveId(null);
+    loadConvos();
+  }
+
   const active = convos.find(c => c.id === activeId);
+  const filtered = convos.filter(c => {
+    // status filter
+    if (statusFilter === "archived") {
+      if (!c.archived_at) return false;
+    } else if (statusFilter === "all") {
+      // include all
+    } else {
+      if (c.archived_at) return false;
+      if (statusFilter === "open" && c.status !== "open") return false;
+      if (statusFilter === "closed" && c.status !== "closed") return false;
+    }
+    // search
+    const q = search.trim().toLowerCase();
+    if (!q) return true;
+    return (
+      (c.visitor_name || "").toLowerCase().includes(q) ||
+      (c.visitor_email || "").toLowerCase().includes(q) ||
+      (c.last_message_preview || "").toLowerCase().includes(q)
+    );
+  });
   const totalUnread = convos.reduce((s, c) => s + (c.unread_admin_count || 0), 0);
+
+  const filterChips: { key: StatusFilter; label: string; count: number }[] = [
+    { key: "open", label: "مفتوحة", count: convos.filter(c => c.status === "open" && !c.archived_at).length },
+    { key: "closed", label: "مغلقة", count: convos.filter(c => c.status === "closed" && !c.archived_at).length },
+    { key: "archived", label: "الأرشيف", count: convos.filter(c => !!c.archived_at).length },
+    { key: "all", label: "الكل", count: convos.length },
+  ];
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -237,16 +280,44 @@ function Inbox() {
         </div>
       </header>
 
-      <div className="flex-1 grid grid-cols-1 md:grid-cols-[320px_1fr] overflow-hidden">
+      <div className="flex-1 grid grid-cols-1 md:grid-cols-[340px_1fr] overflow-hidden">
         {/* Conversation list */}
-        <aside className={`border-l border-border/50 overflow-y-auto ${activeId ? "hidden md:block" : ""}`}>
+        <aside className={`border-l border-border/50 overflow-y-auto flex flex-col ${activeId ? "hidden md:flex" : "flex"}`}>
+          {/* Search + filters */}
+          <div className="p-3 border-b border-border/40 sticky top-0 bg-background/80 backdrop-blur z-10 space-y-2">
+            <div className="relative">
+              <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+              <input
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="ابحث بالاسم، البريد، أو نص الرسالة..."
+                className="w-full bg-input border border-border rounded-xl pr-9 pl-3 py-2 text-xs focus:outline-none focus:border-primary"
+              />
+            </div>
+            <div className="flex items-center gap-1 overflow-x-auto -mx-1 px-1">
+              <Filter className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+              {filterChips.map(f => (
+                <button
+                  key={f.key}
+                  onClick={() => setStatusFilter(f.key)}
+                  className={`text-[11px] rounded-full px-2.5 py-1 whitespace-nowrap transition border ${statusFilter === f.key ? "bg-primary text-primary-foreground border-primary" : "glass border-border/60 hover:border-primary/40"}`}
+                >
+                  {f.label} <span className="opacity-70">({f.count})</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
           {loading && <div className="p-6 text-center text-sm text-muted-foreground"><Loader2 className="h-5 w-5 animate-spin inline" /></div>}
-          {!loading && convos.length === 0 && <div className="p-6 text-center text-sm text-muted-foreground">لا توجد محادثات بعد.</div>}
-          {convos.map(c => (
+          {!loading && filtered.length === 0 && <div className="p-6 text-center text-sm text-muted-foreground">لا توجد محادثات تطابق البحث.</div>}
+          {filtered.map(c => (
             <button key={c.id} onClick={() => setActiveId(c.id)}
-              className={`w-full text-right p-4 border-b border-border/40 hover:bg-secondary/50 transition ${activeId === c.id ? "bg-secondary/70" : ""}`}>
+              className={`w-full text-right p-4 border-b border-border/40 hover:bg-secondary/50 transition ${activeId === c.id ? "bg-secondary/70" : ""} ${c.archived_at ? "opacity-60" : ""}`}>
               <div className="flex items-center justify-between gap-2">
-                <div className="font-bold text-sm truncate">{c.visitor_name || "زائر"}</div>
+                <div className="font-bold text-sm truncate flex items-center gap-1.5">
+                  {c.archived_at && <Archive className="h-3 w-3 text-muted-foreground" />}
+                  {c.visitor_name || "زائر"}
+                </div>
                 {c.unread_admin_count > 0 && (
                   <span className="text-[10px] bg-primary text-primary-foreground rounded-full px-1.5 py-0.5 font-bold min-w-[20px] text-center">
                     {c.unread_admin_count}
@@ -261,17 +332,30 @@ function Inbox() {
         </aside>
 
         {/* Conversation view */}
-        <section className={`flex flex-col overflow-hidden ${!activeId ? "hidden md:flex" : ""}`}>
+        <section className={`flex flex-col overflow-hidden ${!activeId ? "hidden md:flex" : "flex"}`}>
           {!active ? (
             <div className="flex-1 grid place-items-center text-sm text-muted-foreground">اختر محادثة من القائمة</div>
           ) : (
             <>
-              <div className="px-4 py-3 border-b border-border/50 flex items-center justify-between">
-                <div>
-                  <div className="font-bold text-sm">{active.visitor_name || "زائر"}</div>
-                  {active.visitor_email && <div className="text-[11px] text-muted-foreground">{active.visitor_email}</div>}
+              <div className="px-4 py-3 border-b border-border/50 flex items-center justify-between gap-2">
+                <div className="min-w-0">
+                  <div className="font-bold text-sm truncate flex items-center gap-2">
+                    {active.visitor_name || "زائر"}
+                    {active.archived_at && <span className="text-[10px] bg-muted text-muted-foreground rounded-full px-2 py-0.5">مؤرشفة</span>}
+                  </div>
+                  {active.visitor_email && <div className="text-[11px] text-muted-foreground truncate">{active.visitor_email}</div>}
                 </div>
-                <button onClick={() => setActiveId(null)} className="md:hidden text-xs text-primary">رجوع</button>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <button
+                    onClick={() => toggleArchive(active)}
+                    className="rounded-lg glass px-2.5 py-1.5 text-[11px] inline-flex items-center gap-1.5 hover:border-primary/40 transition"
+                    title={active.archived_at ? "استعادة من الأرشيف" : "أرشفة"}
+                  >
+                    {active.archived_at ? <ArchiveRestore className="h-3.5 w-3.5" /> : <Archive className="h-3.5 w-3.5" />}
+                    {active.archived_at ? "استعادة" : "أرشفة"}
+                  </button>
+                  <button onClick={() => setActiveId(null)} className="md:hidden text-xs text-primary px-2">رجوع</button>
+                </div>
               </div>
               <div ref={scrollerRef} className="flex-1 overflow-y-auto p-4 space-y-3">
                 {msgs.map(m => (

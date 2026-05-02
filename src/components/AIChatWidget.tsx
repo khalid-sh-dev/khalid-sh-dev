@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, X, Send, Bot, Loader2, MessageSquare, User } from "lucide-react";
+import { Sparkles, X, Send, Bot, Loader2, MessageSquare, User, CheckCircle2, Ticket } from "lucide-react";
+import { createClient } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
 type Msg = { role: "user" | "assistant"; content: string };
@@ -49,6 +50,22 @@ export default function AIChatWidget() {
   const [convoId, setConvoId] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [needsName, setNeedsName] = useState(true);
+  const [justSent, setJustSent] = useState<{ ticket: string; preview: string } | null>(null);
+  const [visitorId, setVisitorId] = useState<string>("");
+
+  // A dedicated supabase client that always sends the x-visitor-id header,
+  // so RLS policies allow the visitor to read only their own conversation/messages.
+  const visitorClient = useMemo(() => {
+    if (!visitorId) return null;
+    const url = (import.meta as ImportMeta & { env: Record<string, string> }).env.VITE_SUPABASE_URL;
+    const key = (import.meta as ImportMeta & { env: Record<string, string> }).env.VITE_SUPABASE_PUBLISHABLE_KEY;
+    if (!url || !key) return null;
+    return createClient(url, key, {
+      auth: { persistSession: false, autoRefreshToken: false, storage: undefined },
+      global: { headers: { "x-visitor-id": visitorId } },
+      realtime: { params: { eventsPerSecond: 5, headers: { "x-visitor-id": visitorId } } as Record<string, unknown> },
+    });
+  }, [visitorId]);
 
   const scrollerRef = useRef<HTMLDivElement>(null);
   const liveScrollerRef = useRef<HTMLDivElement>(null);
@@ -56,27 +73,27 @@ export default function AIChatWidget() {
   // Init visitor / load existing convo
   useEffect(() => {
     if (typeof window === "undefined") return;
-    getOrCreateVisitorId();
+    const v = getOrCreateVisitorId();
+    setVisitorId(v);
     const savedName = localStorage.getItem(VISITOR_NAME_KEY) || "";
     if (savedName) { setName(savedName); setNeedsName(false); }
     const savedConvo = localStorage.getItem(CONVO_ID_KEY);
     if (savedConvo) { setConvoId(savedConvo); }
   }, []);
 
-  // Load messages when convo opens
+  // Load messages when convo opens — uses visitorClient with x-visitor-id header
   useEffect(() => {
-    if (!convoId) return;
+    if (!convoId || !visitorClient) return;
     let cancelled = false;
     (async () => {
-      const { data } = await supabase
+      const { data } = await visitorClient
         .from("messages")
         .select("id,sender,content,created_at")
         .eq("conversation_id", convoId)
         .order("created_at", { ascending: true });
       if (!cancelled && data) setLiveMsgs(data as LiveMsg[]);
     })();
-    // realtime subscription
-    const channel = supabase
+    const channel = visitorClient
       .channel(`convo-${convoId}`)
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages", filter: `conversation_id=eq.${convoId}` },
         (payload) => {
@@ -87,8 +104,12 @@ export default function AIChatWidget() {
           });
         })
       .subscribe();
-    return () => { cancelled = true; supabase.removeChannel(channel); };
-  }, [convoId]);
+    return () => { cancelled = true; visitorClient.removeChannel(channel); };
+  }, [convoId, visitorClient]);
+
+  function ticketFromConvo(id: string): string {
+    return "KS-" + id.replace(/-/g, "").slice(0, 8).toUpperCase();
+  }
 
   useEffect(() => { scrollerRef.current?.scrollTo({ top: 9e9, behavior: "smooth" }); }, [messages, loading, open]);
   useEffect(() => { liveScrollerRef.current?.scrollTo({ top: 9e9, behavior: "smooth" }); }, [liveMsgs, liveLoading, tab]);
@@ -120,11 +141,12 @@ export default function AIChatWidget() {
     if (!trimmed || liveLoading) return;
     if (needsName) return;
     setLiveLoading(true);
+    const wasFirst = liveMsgs.length === 0;
     try {
-      const visitorId = getOrCreateVisitorId();
+      const v = getOrCreateVisitorId();
       const { data, error } = await supabase.functions.invoke("chat-send", {
         body: {
-          visitor_id: visitorId,
+          visitor_id: v,
           conversation_id: convoId,
           visitor_name: name || null,
           content: trimmed,
@@ -137,8 +159,15 @@ export default function AIChatWidget() {
         localStorage.setItem(CONVO_ID_KEY, newConvoId);
       }
       setLiveInput("");
+      if (wasFirst && newConvoId) {
+        setJustSent({
+          ticket: ticketFromConvo(newConvoId),
+          preview: trimmed.slice(0, 120),
+        });
+      }
     } catch (e) {
       console.error(e);
+      alert("تعذّر إرسال الرسالة، حاول مرة أخرى.");
     } finally { setLiveLoading(false); }
   }
 
@@ -286,8 +315,26 @@ export default function AIChatWidget() {
                   </form>
                 ) : (
                   <>
+                    {justSent && (
+                      <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
+                        className="mx-3 mt-3 rounded-2xl border border-emerald-400/30 bg-emerald-400/10 p-3 flex items-start gap-2.5">
+                        <CheckCircle2 className="h-5 w-5 text-emerald-400 shrink-0 mt-0.5" />
+                        <div className="flex-1 min-w-0">
+                          <div className="text-xs font-bold text-emerald-300">تم استلام رسالتك بنجاح</div>
+                          <div className="text-[11px] text-muted-foreground mt-0.5">سيتواصل خالد معك في أقرب وقت داخل نفس النافذة.</div>
+                          <div className="mt-2 flex items-center gap-1.5 text-[11px]">
+                            <Ticket className="h-3.5 w-3.5 text-primary" />
+                            <span className="text-muted-foreground">رقم تذكرتك:</span>
+                            <code className="font-bold text-primary tracking-wider">{justSent.ticket}</code>
+                          </div>
+                        </div>
+                        <button onClick={() => setJustSent(null)} className="text-muted-foreground hover:text-foreground" aria-label="إخفاء">
+                          <X className="h-4 w-4" />
+                        </button>
+                      </motion.div>
+                    )}
                     <div ref={liveScrollerRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
-                      {liveMsgs.length === 0 && (
+                      {liveMsgs.length === 0 && !justSent && (
                         <div className="text-center text-xs text-muted-foreground py-8">
                           مرحباً {name} 👋<br />
                           ابدأ الدردشة وسيرد عليك خالد في أقرب وقت.
