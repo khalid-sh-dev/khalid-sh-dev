@@ -141,11 +141,12 @@ export default function AIChatWidget() {
     if (!trimmed || liveLoading) return;
     if (needsName) return;
     setLiveLoading(true);
+    const wasFirst = liveMsgs.length === 0;
     try {
-      const visitorId = getOrCreateVisitorId();
+      const v = getOrCreateVisitorId();
       const { data, error } = await supabase.functions.invoke("chat-send", {
         body: {
-          visitor_id: visitorId,
+          visitor_id: v,
           conversation_id: convoId,
           visitor_name: name || null,
           content: trimmed,
@@ -158,8 +159,15 @@ export default function AIChatWidget() {
         localStorage.setItem(CONVO_ID_KEY, newConvoId);
       }
       setLiveInput("");
+      if (wasFirst && newConvoId) {
+        setJustSent({
+          ticket: ticketFromConvo(newConvoId),
+          preview: trimmed.slice(0, 120),
+        });
+      }
     } catch (e) {
       console.error(e);
+      alert("تعذّر إرسال الرسالة، حاول مرة أخرى.");
     } finally { setLiveLoading(false); }
   }
 
