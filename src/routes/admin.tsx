@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, LogOut, Send, MessageSquare, Mail, ShieldAlert, RefreshCw } from "lucide-react";
+import { Loader2, LogOut, Send, MessageSquare, Mail, ShieldAlert, RefreshCw, Search, Archive, ArchiveRestore, Filter } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -22,6 +22,7 @@ type Conversation = {
   last_message_at: string;
   last_message_preview: string | null;
   unread_admin_count: number;
+  archived_at: string | null;
 };
 
 type Message = {
