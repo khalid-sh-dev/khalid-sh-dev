@@ -91,5 +91,15 @@ function RootShell({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
-  return <Outlet />;
+  return (
+    <>
+      <div className="bg-aurora" aria-hidden="true">
+        <div className="grid" />
+        <div className="blob" />
+        <div className="noise" />
+      </div>
+      <Outlet />
+      <Toaster richColors position="top-center" dir="rtl" toastOptions={{ style: { fontFamily: "var(--font-sans)" } }} />
+    </>
+  );
 }
