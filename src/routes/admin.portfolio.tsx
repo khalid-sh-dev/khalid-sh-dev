@@ -51,7 +51,7 @@ type FormState = {
 
 const T = {
   ar: {
-    dir: "rtl" as const,
+    dir: "rtl" as "rtl" | "ltr",
     title: "إدارة معرض الأعمال",
     subtitle: "أضف وعدّل واحذف أعمالك المعروضة على الموقع",
     backHome: "الرئيسية",
@@ -89,7 +89,7 @@ const T = {
     requiredField: "هذا الحقل مطلوب",
   },
   en: {
-    dir: "ltr" as const,
+    dir: "ltr" as "rtl" | "ltr",
     title: "Portfolio Management",
     subtitle: "Add, edit and delete portfolio items shown on the site",
     backHome: "Home",
