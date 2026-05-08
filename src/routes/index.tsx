@@ -525,63 +525,39 @@ function Skills() {
   );
 }
 
+type PortfolioItem = {
+  id: string;
+  title_ar: string;
+  title_en: string | null;
+  short_description_ar: string | null;
+  description_ar: string;
+  thumbnail_url: string | null;
+  images: string[];
+  external_url: string | null;
+  category: string | null;
+};
+
 function Portfolio() {
-  const projects = [
-    {
-      title: "نظام SaaS لإدارة المتاجر",
-      category: "منصة سحابية",
-      desc: "منصة متكاملة تدير المبيعات والمخزون والتقارير في مكان واحد، مع أتمتة كاملة للعمليات اليومية.",
-      tech: ["React", "Node.js", "PostgreSQL", "Cloudflare"],
-      metrics: [{ k: "70%", v: "توفير وقت" }, { k: "+200", v: "متجر مستفيد" }],
-      icon: Layers,
-      accent: "from-cyan-500/30 to-blue-500/30",
-    },
-    {
-      title: "أتمتة فريق المبيعات",
-      category: "Workflow Automation",
-      desc: "ربط CRM مع WhatsApp Business والبريد لإرسال متابعات تلقائية وتسجيل العملاء بدون تدخل يدوي.",
-      tech: ["n8n", "HubSpot", "WhatsApp API"],
-      metrics: [{ k: "12h/يوم", v: "وقت موفّر" }, { k: "+45%", v: "معدل المتابعة" }],
-      icon: Workflow,
-      accent: "from-emerald-500/30 to-cyan-500/30",
-    },
-    {
-      title: "حملة إطلاق براند تجميل",
-      category: "Snapchat & TikTok Ads",
-      desc: "حملة متكاملة لإطلاق منتج جديد في السوق السعودي بميزانية محسوبة ونتائج فاقت المستهدف.",
-      tech: ["Snapchat Ads", "TikTok", "GA4"],
-      metrics: [{ k: "4.6x", v: "ROAS" }, { k: "-38%", v: "تكلفة التحويل" }],
-      icon: Megaphone,
-      accent: "from-rose-500/30 to-amber-500/30",
-    },
-    {
-      title: "Dashboard تنفيذي شامل",
-      category: "Data Analytics",
-      desc: "لوحة قياس تنفيذية تجمع بيانات المبيعات والإعلانات والمخزون من 6 مصادر مختلفة في عرض واحد.",
-      tech: ["Looker Studio", "BigQuery", "Sheets"],
-      metrics: [{ k: "6→1", v: "مصادر موحّدة" }, { k: "حي", v: "تحديث لحظي" }],
-      icon: BarChart3,
-      accent: "from-violet-500/30 to-fuchsia-500/30",
-    },
-    {
-      title: "نظام حجوزات ذكي",
-      category: "Custom Web App",
-      desc: "تطبيق حجوزات مع تأكيد تلقائي عبر SMS والبريد، ولوحة تحكم لإدارة المواعيد والعملاء.",
-      tech: ["Next.js", "Supabase", "Twilio"],
-      metrics: [{ k: "24/7", v: "حجز ذاتي" }, { k: "0", v: "أخطاء بشرية" }],
-      icon: Rocket,
-      accent: "from-sky-500/30 to-indigo-500/30",
-    },
-    {
-      title: "وكيل AI لخدمة العملاء",
-      category: "AI Agent",
-      desc: "وكيل ذكاء اصطناعي يجاوب على استفسارات العملاء على الموقع والواتساب باللهجة السعودية.",
-      tech: ["Gemini", "RAG", "Vector DB"],
-      metrics: [{ k: "82%", v: "معدل الحل" }, { k: "<3s", v: "زمن الرد" }],
-      icon: Bot,
-      accent: "from-amber-500/30 to-orange-500/30",
-    },
-  ];
+  const [items, setItems] = useState<PortfolioItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    import("@/integrations/supabase/client").then(({ supabase }) => {
+      supabase
+        .from("portfolio_items")
+        .select("id,title_ar,title_en,short_description_ar,description_ar,thumbnail_url,images,external_url,category")
+        .eq("is_published", true)
+        .order("display_order", { ascending: true })
+        .order("created_at", { ascending: false })
+        .then(({ data }) => {
+          if (mounted && data) setItems(data as PortfolioItem[]);
+          if (mounted) setLoading(false);
+        });
+    });
+    return () => { mounted = false; };
+  }, []);
+
   return (
     <section id="portfolio" className="relative py-24 scroll-mt-24">
       <div className="absolute inset-0 grid-bg opacity-20 [mask-image:radial-gradient(ellipse_at_center,black,transparent_70%)]" />
@@ -600,52 +576,62 @@ function Portfolio() {
           </button>
         </motion.div>
 
-        <div className="mt-14 grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {projects.map((p, i) => (
-            <motion.article
-              key={p.title}
-              initial="hidden" whileInView="show" viewport={{ once: true }}
-              variants={fadeUp} transition={{ delay: i * 0.06 }}
-              className="group relative glass-strong rounded-3xl overflow-hidden hover:-translate-y-2 transition duration-500"
-            >
-              {/* Visual header */}
-              <div className={`relative h-44 overflow-hidden bg-gradient-to-br ${p.accent}`}>
-                <div className="absolute inset-0 grid-bg opacity-30" />
-                <div className="absolute inset-0 grid place-items-center">
-                  <p.icon className="h-16 w-16 text-foreground/80 group-hover:scale-110 group-hover:rotate-6 transition duration-500" strokeWidth={1.2} />
-                </div>
-                <div className="absolute top-4 right-4 glass rounded-full px-3 py-1 text-[11px] font-bold">
-                  {p.category}
-                </div>
-              </div>
-
-              {/* Body */}
-              <div className="p-6">
-                <h3 className="font-display text-lg leading-snug">{p.title}</h3>
-                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{p.desc}</p>
-
-                <div className="mt-4 grid grid-cols-2 gap-2">
-                  {p.metrics.map(m => (
-                    <div key={m.v} className="glass rounded-xl p-2.5 text-center">
-                      <div className="font-display text-base text-gradient-cyan">{m.k}</div>
-                      <div className="text-[10px] text-muted-foreground mt-0.5">{m.v}</div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="mt-4 flex flex-wrap gap-1.5">
-                  {p.tech.map(t => (
-                    <span key={t} className="text-[10px] px-2 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20">{t}</span>
-                  ))}
-                </div>
-              </div>
-            </motion.article>
-          ))}
-        </div>
-
-        <div className="mt-12 text-center text-xs text-muted-foreground">
-          * بعض الأعمال خاصة وتم إخفاء أسماء العملاء حفاظاً على السرية.
-        </div>
+        {loading ? (
+          <div className="mt-14 grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[0,1,2,3,4,5].map(i => (
+              <div key={i} className="glass-strong rounded-3xl h-80 animate-pulse" />
+            ))}
+          </div>
+        ) : items.length === 0 ? (
+          <div className="mt-14 glass-strong rounded-3xl p-12 text-center">
+            <Layers className="h-12 w-12 mx-auto text-primary/60" />
+            <p className="mt-4 text-muted-foreground">سيتم عرض الأعمال هنا قريباً.</p>
+          </div>
+        ) : (
+          <div className="mt-14 grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {items.map((p, i) => {
+              const Inner = (
+                <>
+                  <div className="relative h-44 overflow-hidden bg-gradient-to-br from-cyan-500/20 to-blue-500/20">
+                    {p.thumbnail_url ? (
+                      <img src={p.thumbnail_url} alt={p.title_ar} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                    ) : (
+                      <div className="absolute inset-0 grid place-items-center">
+                        <Layers className="h-16 w-16 text-foreground/70" strokeWidth={1.2} />
+                      </div>
+                    )}
+                    {p.category && (
+                      <div className="absolute top-4 right-4 glass rounded-full px-3 py-1 text-[11px] font-bold">{p.category}</div>
+                    )}
+                  </div>
+                  <div className="p-6">
+                    <h3 className="font-display text-lg leading-snug">{p.title_ar}</h3>
+                    <p className="mt-2 text-sm text-muted-foreground leading-relaxed line-clamp-3">
+                      {p.short_description_ar || p.description_ar}
+                    </p>
+                    {p.external_url && (
+                      <div className="mt-5 inline-flex items-center gap-1.5 text-sm text-primary font-bold">
+                        عرض المشروع <ArrowUpRight className="h-4 w-4" />
+                      </div>
+                    )}
+                  </div>
+                </>
+              );
+              return (
+                <motion.article
+                  key={p.id}
+                  initial="hidden" whileInView="show" viewport={{ once: true }}
+                  variants={fadeUp} transition={{ delay: i * 0.06 }}
+                  className="group relative glass-strong rounded-3xl overflow-hidden hover:-translate-y-2 transition duration-500"
+                >
+                  {p.external_url ? (
+                    <a href={p.external_url} target="_blank" rel="noopener noreferrer" className="block">{Inner}</a>
+                  ) : Inner}
+                </motion.article>
+              );
+            })}
+          </div>
+        )}
       </div>
     </section>
   );
