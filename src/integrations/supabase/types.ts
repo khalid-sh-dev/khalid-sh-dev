@@ -88,6 +88,63 @@ export type Database = {
           },
         ]
       }
+      portfolio_items: {
+        Row: {
+          category: string | null
+          created_at: string
+          created_by: string | null
+          description_ar: string
+          description_en: string | null
+          display_order: number
+          external_url: string | null
+          id: string
+          images: string[]
+          is_published: boolean
+          short_description_ar: string | null
+          short_description_en: string | null
+          thumbnail_url: string | null
+          title_ar: string
+          title_en: string | null
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          description_ar: string
+          description_en?: string | null
+          display_order?: number
+          external_url?: string | null
+          id?: string
+          images?: string[]
+          is_published?: boolean
+          short_description_ar?: string | null
+          short_description_en?: string | null
+          thumbnail_url?: string | null
+          title_ar: string
+          title_en?: string | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          description_ar?: string
+          description_en?: string | null
+          display_order?: number
+          external_url?: string | null
+          id?: string
+          images?: string[]
+          is_published?: boolean
+          short_description_ar?: string | null
+          short_description_en?: string | null
+          thumbnail_url?: string | null
+          title_ar?: string
+          title_en?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
