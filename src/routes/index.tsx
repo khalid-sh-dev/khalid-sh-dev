@@ -21,12 +21,18 @@ export const Route = createFileRoute("/")({
     meta: [
       { title: PAGE_TITLE },
       { name: "description", content: PAGE_DESC },
+      { name: "google-site-verification", content: "FBIryYkocqm8iD_zPXL6PGrTpHlDLs5uSUNixCcGmUY" },
       { property: "og:title", content: PAGE_TITLE },
       { property: "og:description", content: PAGE_DESC },
-      { property: "og:url", content: "/" },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://khalid-sh-dev.lovable.app/" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: PAGE_TITLE },
       { name: "twitter:description", content: PAGE_DESC },
       { name: "theme-color", content: "#0b1426" },
+    ],
+    links: [
+      { rel: "canonical", href: "https://khalid-sh-dev.lovable.app/" },
     ],
     scripts: [
       {
