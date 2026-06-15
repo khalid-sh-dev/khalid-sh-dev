@@ -144,7 +144,9 @@ describe("SeoHostGuard — sitemap & robots exclude lovable.app", () => {
   it("sitemap.xml advertises only vercel.app", () => {
     const sm = readFileSync(resolve(__dirname, "../../public/sitemap.xml"), "utf8");
     expect(sm).toContain("khalid-sh-dev.vercel.app");
-    expect(sm).not.toContain("lovable.app");
+    const locs = Array.from(sm.matchAll(/<loc>([^<]+)<\/loc>/g)).map((m) => m[1]);
+    expect(locs.length).toBeGreaterThan(0);
+    expect(locs.every((l) => !l.includes("lovable.app"))).toBe(true);
   });
 
   it("robots.txt sitemap directive points at vercel.app", () => {
