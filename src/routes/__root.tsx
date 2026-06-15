@@ -138,6 +138,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
 function RootComponent() {
   return (
     <>
+      <SeoHostGuard />
       <div className="bg-aurora" aria-hidden="true">
         <div className="grid" />
         <div className="blob" />
