@@ -1,7 +1,52 @@
-import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
+import { Outlet, Link, createRootRoute, HeadContent, Scripts, useRouterState } from "@tanstack/react-router";
 import { Toaster } from "sonner";
+import { useEffect } from "react";
 
 import appCss from "../styles.css?url";
+
+const PRODUCTION_ORIGIN = "https://khalid-sh-dev.vercel.app";
+
+function SeoHostGuard() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const search = useRouterState({ select: (s) => s.location.searchStr });
+
+  // Top-priority redirect — runs synchronously on first render in the browser
+  if (typeof window !== "undefined" && window.location.hostname.includes("lovable.app")) {
+    window.location.replace(PRODUCTION_ORIGIN + window.location.pathname + window.location.search);
+  }
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const isStaging =
+      typeof window !== "undefined" && window.location.hostname.includes("lovable.app");
+
+    // Canonical — always points to production
+    let canonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"][data-seo-guard="1"]');
+    if (!canonical) {
+      canonical = document.createElement("link");
+      canonical.rel = "canonical";
+      canonical.setAttribute("data-seo-guard", "1");
+      document.head.appendChild(canonical);
+    }
+    canonical.href = PRODUCTION_ORIGIN + pathname;
+
+    // Conditional noindex — only on lovable.app
+    let robots = document.querySelector<HTMLMetaElement>('meta[name="robots"][data-seo-guard="1"]');
+    if (isStaging) {
+      if (!robots) {
+        robots = document.createElement("meta");
+        robots.name = "robots";
+        robots.setAttribute("data-seo-guard", "1");
+        document.head.appendChild(robots);
+      }
+      robots.content = "noindex, nofollow, noarchive";
+    } else if (robots) {
+      robots.remove();
+    }
+  }, [pathname, search]);
+
+  return null;
+}
 
 const GA_ID = (import.meta.env.VITE_GA_MEASUREMENT_ID as string | undefined) || "";
 
