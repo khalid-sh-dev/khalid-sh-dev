@@ -10,9 +10,16 @@ function SeoHostGuard() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const search = useRouterState({ select: (s) => s.location.searchStr });
 
-  // Top-priority redirect — runs synchronously on first render in the browser
+  // Top-priority redirect — runs synchronously on first render in the browser.
+  // Preserves pathname (incl. trailing slash), search, and hash exactly so
+  // crawlers and users land on the same resource on the production origin.
   if (typeof window !== "undefined" && window.location.hostname.includes("lovable.app")) {
-    window.location.replace(PRODUCTION_ORIGIN + window.location.pathname + window.location.search);
+    const target =
+      PRODUCTION_ORIGIN +
+      window.location.pathname +
+      window.location.search +
+      window.location.hash;
+    window.location.replace(target);
   }
 
   useEffect(() => {
@@ -20,18 +27,29 @@ function SeoHostGuard() {
     const isStaging =
       typeof window !== "undefined" && window.location.hostname.includes("lovable.app");
 
-    // Canonical — always points to production
-    let canonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"][data-seo-guard="1"]');
+    // Canonical — always points to production, preserving trailing slash + search.
+    // Hash fragments are intentionally excluded (not indexed by crawlers).
+    const searchStr = search && !search.startsWith("?") ? `?${search}` : search || "";
+    let canonical = document.querySelector<HTMLLinkElement>(
+      'link[rel="canonical"][data-seo-guard="1"]',
+    );
     if (!canonical) {
       canonical = document.createElement("link");
       canonical.rel = "canonical";
       canonical.setAttribute("data-seo-guard", "1");
       document.head.appendChild(canonical);
     }
-    canonical.href = PRODUCTION_ORIGIN + pathname;
+    canonical.href = PRODUCTION_ORIGIN + pathname + searchStr;
+
+    // Remove any stale static canonical so we don't ship two.
+    document
+      .querySelectorAll('link[rel="canonical"]:not([data-seo-guard="1"])')
+      .forEach((el) => el.remove());
 
     // Conditional noindex — only on lovable.app
-    let robots = document.querySelector<HTMLMetaElement>('meta[name="robots"][data-seo-guard="1"]');
+    let robots = document.querySelector<HTMLMetaElement>(
+      'meta[name="robots"][data-seo-guard="1"]',
+    );
     if (isStaging) {
       if (!robots) {
         robots = document.createElement("meta");
