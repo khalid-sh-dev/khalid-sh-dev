@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Production canonical sitemap. Only vercel.app URLs are advertised;
+     the lovable.app preview mirror is excluded from indexing by the
+     SeoHostGuard noindex meta + the inline guard in index.html. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://khalid-sh-dev.lovable.app/</loc>
+    <loc>https://khalid-sh-dev.vercel.app/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>

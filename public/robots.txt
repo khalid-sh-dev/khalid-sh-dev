@@ -1,5 +1,13 @@
 User-agent: *
 Allow: /
 Disallow: /admin
+Disallow: /admin/
 
-Sitemap: https://khalid-sh-dev.lovable.app/sitemap.xml
+# Block indexing of the Lovable preview/staging mirror.
+# The production canonical lives on vercel.app.
+User-agent: *
+Disallow: /*?lovable-preview
+# (Hostname-level blocking is enforced via <meta name="robots"> on lovable.app
+# hosts — see SeoHostGuard and the inline guard in index.html.)
+
+Sitemap: https://khalid-sh-dev.vercel.app/sitemap.xml

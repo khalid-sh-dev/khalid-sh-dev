@@ -1,6 +1,32 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
   <head>
+    <!-- SEO host guard — runs SYNCHRONOUSLY before any render or asset load.
+         On lovable.app (staging mirror) it (1) injects noindex/nofollow so
+         crawlers that ignore JS never index the preview, and (2) replaces
+         the location with the production vercel.app origin, preserving the
+         path (incl. trailing slash), search, and hash exactly. -->
+    <script>
+      (function () {
+        try {
+          var PROD = "https://khalid-sh-dev.vercel.app";
+          var host = window.location.hostname || "";
+          if (host.indexOf("lovable.app") !== -1) {
+            var m = document.createElement("meta");
+            m.name = "robots";
+            m.content = "noindex, nofollow, noarchive";
+            m.setAttribute("data-seo-guard", "1");
+            (document.head || document.documentElement).appendChild(m);
+            var target =
+              PROD +
+              window.location.pathname +
+              window.location.search +
+              window.location.hash;
+            window.location.replace(target);
+          }
+        } catch (e) {}
+      })();
+    </script>
     <meta charset="UTF-8" />
     <link rel="icon" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -10,7 +36,7 @@
     <meta name="description" content="المهندس خالد الشريف — متخصص أتمتة التسويق والنمو في السوق السعودي. حملات إعلانية ذكية، أنظمة SaaS، وأتمتة العمليات لزيادة المبيعات." />
     <meta name="author" content="خالد الشريف" />
     <meta name="keywords" content="أتمتة التسويق, خالد الشريف, حملات إعلانية, SaaS, السوق السعودي, نمو رقمي, Snapchat Ads, TikTok Ads" />
-    <link rel="canonical" href="https://khalid-sh-dev.lovable.app/" />
+    <link rel="canonical" href="https://khalid-sh-dev.vercel.app/" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="apple-touch-icon" href="/icons/icon-192.png" />
     <meta property="og:type" content="website" />
@@ -18,7 +44,7 @@
     <meta property="og:site_name" content="المهندس خالد الشريف" />
     <meta property="og:title" content="المهندس خالد الشريف | أتمتة التسويق والنمو الرقمي" />
     <meta property="og:description" content="متخصص أتمتة التسويق والنمو في السوق السعودي — حملات ذكية، SaaS، وأتمتة عمليات." />
-    <meta property="og:url" content="https://khalid-sh-dev.lovable.app/" />
+    <meta property="og:url" content="https://khalid-sh-dev.vercel.app/" />
     <meta property="og:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/e5d25ef8-7653-45d3-a95d-6266b2b775f1" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="640" />
