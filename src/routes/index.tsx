@@ -12,6 +12,9 @@ import { z } from "zod";
 import portrait from "@/assets/khalid-portrait.png";
 import dashboard from "@/assets/dashboard-mockup.jpg";
 import AIChatWidget from "@/components/AIChatWidget";
+import Qualifications from "@/components/Qualifications";
+import DynamicSocialLinks from "@/components/DynamicSocialLinks";
+import SiteMobileNav from "@/components/SiteMobileNav";
 
 const PAGE_TITLE = "المهندس خالد الشريف — أتمتة التسويق والنمو";
 const PAGE_DESC = "متخصص في بناء أنظمة الأتمتة وإدارة الحملات الإعلانية الذكية للسوق السعودي. ندمج التقنية بالتسويق لأتمتة نمو أعمالكم.";
@@ -1041,11 +1044,7 @@ function Footer() {
         <div className="text-sm text-muted-foreground text-center">
           جميع الحقوق محفوظة للمهندس: خالد الشريف © 2024
         </div>
-        <div className="flex items-center gap-3">
-          <a href="mailto:khalid.sh.dev@gmail.com" className="h-10 w-10 grid place-items-center rounded-lg glass hover:text-primary transition"><Mail className="h-4 w-4" /></a>
-          <a href="#" aria-label="WhatsApp" className="h-10 w-10 grid place-items-center rounded-lg glass hover:text-primary transition"><MessageCircle className="h-4 w-4" /></a>
-          <a href="#" aria-label="Phone" className="h-10 w-10 grid place-items-center rounded-lg glass hover:text-primary transition"><Phone className="h-4 w-4" /></a>
-        </div>
+        <DynamicSocialLinks />
       </div>
     </footer>
   );
