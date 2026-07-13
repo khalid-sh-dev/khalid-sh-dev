@@ -48,7 +48,7 @@ function Page() {
   }, []);
 
   async function load() {
-    const { data } = await supabase.from("qualifications" as never).select("*").order("display_order");
+    const { data } = await (supabase as any).from("qualifications").select("*").order("display_order");
     if (data) setItems(data as unknown as Q[]);
   }
 
@@ -58,11 +58,11 @@ function Page() {
     setSaving(true);
     try {
       if (editingId) {
-        const { error } = await supabase.from("qualifications" as never).update(form).eq("id", editingId);
+        const { error } = await (supabase as any).from("qualifications").update(form).eq("id", editingId);
         if (error) throw error;
         toast.success("تم التحديث");
       } else {
-        const { error } = await supabase.from("qualifications" as never).insert(form);
+        const { error } = await (supabase as any).from("qualifications").insert(form);
         if (error) throw error;
         toast.success("تمت الإضافة");
       }
@@ -74,7 +74,7 @@ function Page() {
 
   async function remove(id: string) {
     if (!confirm("حذف هذا العنصر؟")) return;
-    const { error } = await supabase.from("qualifications" as never).delete().eq("id", id);
+    const { error } = await (supabase as any).from("qualifications").delete().eq("id", id);
     if (error) return toast.error(error.message);
     toast.success("تم الحذف");
     await load();

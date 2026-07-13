@@ -29,7 +29,7 @@ export function useSiteLinks(category?: string) {
   const [links, setLinks] = useState<L[]>([]);
   useEffect(() => {
     (async () => {
-      let q = supabase.from("site_links" as never).select("*").eq("is_published", true).order("display_order");
+      let q = (supabase as any).from("site_links").select("*").eq("is_published", true).order("display_order");
       if (category) q = q.eq("category", category);
       const { data } = await q;
       if (data) setLinks(data as unknown as L[]);

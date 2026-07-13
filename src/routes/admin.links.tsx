@@ -45,7 +45,7 @@ function Page() {
   }, []);
 
   async function load() {
-    const { data } = await supabase.from("site_links" as never).select("*").order("display_order");
+    const { data } = await (supabase as any).from("site_links").select("*").order("display_order");
     if (data) setItems(data as unknown as L[]);
   }
 
@@ -55,11 +55,11 @@ function Page() {
     setSaving(true);
     try {
       if (editingId) {
-        const { error } = await supabase.from("site_links" as never).update(form).eq("id", editingId);
+        const { error } = await (supabase as any).from("site_links").update(form).eq("id", editingId);
         if (error) throw error;
         toast.success("تم التحديث");
       } else {
-        const { error } = await supabase.from("site_links" as never).insert(form);
+        const { error } = await (supabase as any).from("site_links").insert(form);
         if (error) throw error;
         toast.success("تمت الإضافة");
       }
@@ -71,7 +71,7 @@ function Page() {
 
   async function remove(id: string) {
     if (!confirm("حذف الرابط؟")) return;
-    const { error } = await supabase.from("site_links" as never).delete().eq("id", id);
+    const { error } = await (supabase as any).from("site_links").delete().eq("id", id);
     if (error) return toast.error(error.message);
     toast.success("تم الحذف");
     await load();
