@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  Mail, MessageCircle, Phone, Linkedin, Twitter, Instagram, Facebook, Youtube,
-  Github, Globe, Link as LinkIcon, Send as TelegramIcon, Music2,
+  Mail, MessageCircle, Phone, Globe, Link as LinkIcon, Send as TelegramIcon, Music2, AtSign,
 } from "lucide-react";
+const Linkedin = AtSign, Twitter = AtSign, Instagram = AtSign, Facebook = AtSign, Youtube = AtSign, Github = AtSign;
 
 type L = {
   id: string;
