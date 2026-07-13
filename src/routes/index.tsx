@@ -12,6 +12,9 @@ import { z } from "zod";
 import portrait from "@/assets/khalid-portrait.png";
 import dashboard from "@/assets/dashboard-mockup.jpg";
 import AIChatWidget from "@/components/AIChatWidget";
+import Qualifications from "@/components/Qualifications";
+import DynamicSocialLinks from "@/components/DynamicSocialLinks";
+import SiteMobileNav from "@/components/SiteMobileNav";
 
 const PAGE_TITLE = "المهندس خالد الشريف — أتمتة التسويق والنمو";
 const PAGE_DESC = "متخصص في بناء أنظمة الأتمتة وإدارة الحملات الإعلانية الذكية للسوق السعودي. ندمج التقنية بالتسويق لأتمتة نمو أعمالكم.";
@@ -133,6 +136,7 @@ function Nav() {
     { id: "skills", label: "المهارات" },
     { id: "services", label: "الخدمات" },
     { id: "portfolio", label: "أعمالي" },
+    { id: "qualifications", label: "شهاداتي" },
     { id: "testimonials", label: "العملاء" },
     { id: "faq", label: "أسئلة" },
     { id: "contact", label: "تواصل" },
@@ -145,14 +149,19 @@ function Nav() {
             <span className="h-8 w-8 rounded-lg bg-[image:var(--gradient-cyan)] grid place-items-center text-background font-bold">خ</span>
             <span className="hidden sm:inline">خالد الشريف</span>
           </button>
-          <div className="hidden md:flex items-center gap-7 text-sm text-muted-foreground">
+          <div className="hidden md:flex items-center gap-6 text-sm text-muted-foreground">
             {links.map(l => (
               <button key={l.id} onClick={() => smoothScrollTo(l.id)} className="hover:text-primary transition-colors">{l.label}</button>
             ))}
           </div>
-          <button onClick={() => smoothScrollTo("contact")} className="rounded-xl bg-primary text-primary-foreground px-4 py-2 text-sm font-bold hover:opacity-90 transition">
-            تواصل معي
-          </button>
+          <div className="flex items-center gap-2">
+            <a href="/admin" aria-label="حسابي" title="تسجيل الدخول / حسابي" className="h-9 w-9 grid place-items-center rounded-lg glass hover:text-primary hover:border-primary/40 transition">
+              <Briefcase className="h-4 w-4" />
+            </a>
+            <button onClick={() => smoothScrollTo("contact")} className="rounded-xl bg-primary text-primary-foreground px-4 py-2 text-sm font-bold hover:opacity-90 transition">
+              تواصل معي
+            </button>
+          </div>
         </nav>
       </div>
     </header>
@@ -1041,11 +1050,7 @@ function Footer() {
         <div className="text-sm text-muted-foreground text-center">
           جميع الحقوق محفوظة للمهندس: خالد الشريف © 2024
         </div>
-        <div className="flex items-center gap-3">
-          <a href="mailto:khalid.sh.dev@gmail.com" className="h-10 w-10 grid place-items-center rounded-lg glass hover:text-primary transition"><Mail className="h-4 w-4" /></a>
-          <a href="#" aria-label="WhatsApp" className="h-10 w-10 grid place-items-center rounded-lg glass hover:text-primary transition"><MessageCircle className="h-4 w-4" /></a>
-          <a href="#" aria-label="Phone" className="h-10 w-10 grid place-items-center rounded-lg glass hover:text-primary transition"><Phone className="h-4 w-4" /></a>
-        </div>
+        <DynamicSocialLinks />
       </div>
     </footer>
   );
@@ -1073,12 +1078,14 @@ function Index() {
         <Product />
         <Services />
         <Portfolio />
+        <Qualifications />
         <Testimonials />
         <FAQ />
         <Contact />
       </main>
       <Footer />
       <AIChatWidget />
+      <SiteMobileNav />
     </div>
   );
 }

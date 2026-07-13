@@ -24,6 +24,7 @@ export type Database = {
           status: string
           unread_admin_count: number
           unread_user_count: number
+          user_id: string | null
           visitor_email: string | null
           visitor_id: string
           visitor_name: string | null
@@ -37,6 +38,7 @@ export type Database = {
           status?: string
           unread_admin_count?: number
           unread_user_count?: number
+          user_id?: string | null
           visitor_email?: string | null
           visitor_id: string
           visitor_name?: string | null
@@ -50,6 +52,7 @@ export type Database = {
           status?: string
           unread_admin_count?: number
           unread_user_count?: number
+          user_id?: string | null
           visitor_email?: string | null
           visitor_id?: string
           visitor_name?: string | null
@@ -142,6 +145,90 @@ export type Database = {
           title_ar?: string
           title_en?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      qualifications: {
+        Row: {
+          created_at: string
+          display_order: number
+          id: string
+          institution_ar: string | null
+          institution_en: string | null
+          is_published: boolean
+          title_ar: string
+          title_en: string | null
+          type: string | null
+          updated_at: string
+          url: string | null
+          year: string | null
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          institution_ar?: string | null
+          institution_en?: string | null
+          is_published?: boolean
+          title_ar: string
+          title_en?: string | null
+          type?: string | null
+          updated_at?: string
+          url?: string | null
+          year?: string | null
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          institution_ar?: string | null
+          institution_en?: string | null
+          is_published?: boolean
+          title_ar?: string
+          title_en?: string | null
+          type?: string | null
+          updated_at?: string
+          url?: string | null
+          year?: string | null
+        }
+        Relationships: []
+      }
+      site_links: {
+        Row: {
+          category: string
+          created_at: string
+          display_order: number
+          icon: string | null
+          id: string
+          is_published: boolean
+          label_ar: string
+          label_en: string | null
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          display_order?: number
+          icon?: string | null
+          id?: string
+          is_published?: boolean
+          label_ar: string
+          label_en?: string | null
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          display_order?: number
+          icon?: string | null
+          id?: string
+          is_published?: boolean
+          label_ar?: string
+          label_en?: string | null
+          updated_at?: string
+          url?: string
         }
         Relationships: []
       }

@@ -11,7 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminQualificationsRouteImport } from './routes/admin.qualifications'
 import { Route as AdminPortfolioRouteImport } from './routes/admin.portfolio'
+import { Route as AdminLinksRouteImport } from './routes/admin.links'
 
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
@@ -23,34 +25,66 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminQualificationsRoute = AdminQualificationsRouteImport.update({
+  id: '/qualifications',
+  path: '/qualifications',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminPortfolioRoute = AdminPortfolioRouteImport.update({
   id: '/portfolio',
   path: '/portfolio',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminLinksRoute = AdminLinksRouteImport.update({
+  id: '/links',
+  path: '/links',
   getParentRoute: () => AdminRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/admin/links': typeof AdminLinksRoute
   '/admin/portfolio': typeof AdminPortfolioRoute
+  '/admin/qualifications': typeof AdminQualificationsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/admin/links': typeof AdminLinksRoute
   '/admin/portfolio': typeof AdminPortfolioRoute
+  '/admin/qualifications': typeof AdminQualificationsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/admin/links': typeof AdminLinksRoute
   '/admin/portfolio': typeof AdminPortfolioRoute
+  '/admin/qualifications': typeof AdminQualificationsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/admin' | '/admin/portfolio'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/admin/links'
+    | '/admin/portfolio'
+    | '/admin/qualifications'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/admin/portfolio'
-  id: '__root__' | '/' | '/admin' | '/admin/portfolio'
+  to:
+    | '/'
+    | '/admin'
+    | '/admin/links'
+    | '/admin/portfolio'
+    | '/admin/qualifications'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/admin/links'
+    | '/admin/portfolio'
+    | '/admin/qualifications'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -74,6 +108,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/qualifications': {
+      id: '/admin/qualifications'
+      path: '/qualifications'
+      fullPath: '/admin/qualifications'
+      preLoaderRoute: typeof AdminQualificationsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/portfolio': {
       id: '/admin/portfolio'
       path: '/portfolio'
@@ -81,15 +122,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPortfolioRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/links': {
+      id: '/admin/links'
+      path: '/links'
+      fullPath: '/admin/links'
+      preLoaderRoute: typeof AdminLinksRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
 interface AdminRouteChildren {
+  AdminLinksRoute: typeof AdminLinksRoute
   AdminPortfolioRoute: typeof AdminPortfolioRoute
+  AdminQualificationsRoute: typeof AdminQualificationsRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminLinksRoute: AdminLinksRoute,
   AdminPortfolioRoute: AdminPortfolioRoute,
+  AdminQualificationsRoute: AdminQualificationsRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)

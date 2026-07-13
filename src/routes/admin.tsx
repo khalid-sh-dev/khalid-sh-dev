@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, LogOut, Send, MessageSquare, Mail, ShieldAlert, RefreshCw, Search, Archive, ArchiveRestore, Filter } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { Loader2, LogOut, Send, MessageSquare, Mail, ShieldAlert, RefreshCw, Search, Archive, ArchiveRestore, Filter, Briefcase, GraduationCap, Link as LinkIcon } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -270,7 +271,16 @@ function Inbox() {
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <Link to="/admin/portfolio" className="rounded-lg glass px-3 py-1.5 text-xs inline-flex items-center gap-1.5 hover:border-primary/40 transition">
+            <Briefcase className="h-3.5 w-3.5" /> الأعمال
+          </Link>
+          <Link to="/admin/qualifications" className="rounded-lg glass px-3 py-1.5 text-xs inline-flex items-center gap-1.5 hover:border-primary/40 transition">
+            <GraduationCap className="h-3.5 w-3.5" /> الشهادات
+          </Link>
+          <Link to="/admin/links" className="rounded-lg glass px-3 py-1.5 text-xs inline-flex items-center gap-1.5 hover:border-primary/40 transition">
+            <LinkIcon className="h-3.5 w-3.5" /> الروابط
+          </Link>
           <button onClick={loadConvos} className="rounded-lg glass px-3 py-1.5 text-xs inline-flex items-center gap-1.5">
             <RefreshCw className="h-3.5 w-3.5" /> تحديث
           </button>
