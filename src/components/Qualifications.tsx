@@ -19,8 +19,8 @@ export default function Qualifications() {
 
   useEffect(() => {
     (async () => {
-      const { data } = await supabase
-        .from("qualifications" as never)
+      const { data } = await (supabase as any)
+        .from("qualifications")
         .select("*")
         .eq("is_published", true)
         .order("display_order", { ascending: true });
