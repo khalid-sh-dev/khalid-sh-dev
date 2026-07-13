@@ -1072,12 +1072,14 @@ function Index() {
         <Product />
         <Services />
         <Portfolio />
+        <Qualifications />
         <Testimonials />
         <FAQ />
         <Contact />
       </main>
       <Footer />
       <AIChatWidget />
+      <SiteMobileNav />
     </div>
   );
 }
