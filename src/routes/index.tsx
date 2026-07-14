@@ -173,7 +173,7 @@ function Nav() {
             <a href="/admin" aria-label="حسابي" title="تسجيل الدخول / حسابي" className="h-9 w-9 grid place-items-center rounded-lg glass hover:text-primary hover:border-primary/40 transition">
               <Briefcase className="h-4 w-4" />
             </a>
-            <button onClick={() => smoothScrollTo("contact")} className="hidden sm:inline-flex rounded-xl bg-primary text-primary-foreground px-4 py-2 text-sm font-bold hover:opacity-90 transition">
+            <button onClick={() => handleContactClick("nav")} className="hidden sm:inline-flex rounded-xl bg-primary text-primary-foreground px-4 py-2 text-sm font-bold hover:opacity-90 transition">
               تواصل معي
             </button>
             <button onClick={() => setOpen(o => !o)} aria-label="القائمة" className="md:hidden h-9 w-9 grid place-items-center rounded-lg glass hover:text-primary hover:border-primary/40 transition">
@@ -223,7 +223,7 @@ function Hero() {
             متخصص في بناء أنظمة الأتمتة وإدارة الحملات الإعلانية الذكية للسوق السعودي.
           </p>
           <div className="mt-8 flex flex-wrap justify-center lg:justify-start gap-4">
-            <button onClick={() => smoothScrollTo("contact")} className="group inline-flex items-center gap-2 rounded-xl bg-[image:var(--gradient-cyan)] text-background px-6 py-3.5 font-bold glow-cyan hover:scale-[1.03] active:scale-95 transition-all">
+            <button onClick={() => handleContactClick("hero")} className="group inline-flex items-center gap-2 rounded-xl bg-[image:var(--gradient-cyan)] text-background px-6 py-3.5 font-bold glow-cyan hover:scale-[1.03] active:scale-95 transition-all">
               تواصل معي
               <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition" />
             </button>
@@ -611,7 +611,7 @@ function Portfolio() {
             </h2>
             <p className="mt-4 text-muted-foreground">عينة من المشاريع التي نفّذتها في مجالات الأتمتة والتطوير والإعلانات الرقمية.</p>
           </div>
-          <button onClick={() => smoothScrollTo("contact")} className="hidden sm:inline-flex items-center gap-2 glass-strong rounded-xl px-5 py-3 font-bold hover:border-primary/40 transition self-start sm:self-auto">
+          <button onClick={() => handleContactClick("portfolio_cta")} className="hidden sm:inline-flex items-center gap-2 glass-strong rounded-xl px-5 py-3 font-bold hover:border-primary/40 transition self-start sm:self-auto">
             ابدأ مشروعك
             <ArrowUpRight className="h-4 w-4" />
           </button>
@@ -916,6 +916,7 @@ function AnimatedBackground() {
 }
 
 function Index() {
+  useEffect(() => { trackEvent("page_view", "home"); }, []);
   return (
     <div className="min-h-screen relative">
       <AnimatedBackground />
