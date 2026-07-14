@@ -8,13 +8,28 @@ import {
   Code2, Database, Layers, ArrowUpRight, Rocket, ShieldCheck,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { z } from "zod";
 import portrait from "@/assets/khalid-portrait.png";
 import dashboard from "@/assets/dashboard-mockup.jpg";
 import AIChatWidget from "@/components/AIChatWidget";
 import Qualifications from "@/components/Qualifications";
 import DynamicSocialLinks from "@/components/DynamicSocialLinks";
 import SiteMobileNav from "@/components/SiteMobileNav";
+import { supabase } from "@/integrations/supabase/client";
+
+// Lightweight analytics — fire-and-forget event log
+function trackEvent(event_type: string, label?: string) {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any).from("page_events").insert({
+      event_type, label: label ?? null,
+      path: typeof window !== "undefined" ? window.location.pathname : null,
+    }).then(() => {});
+  } catch { /* noop */ }
+}
+function handleContactClick(source: string) {
+  trackEvent("contact_click", source);
+  smoothScrollTo("contact");
+}
 
 const PAGE_TITLE = "المهندس خالد الشريف — أتمتة التسويق والنمو";
 const PAGE_DESC = "متخصص في بناء أنظمة الأتمتة وإدارة الحملات الإعلانية الذكية للسوق السعودي. ندمج التقنية بالتسويق لأتمتة نمو أعمالكم.";
