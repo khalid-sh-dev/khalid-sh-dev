@@ -1071,7 +1071,7 @@ function Index() {
     <div className="min-h-screen relative">
       <AnimatedBackground />
       <Nav />
-      <main>
+      <main className="pb-24 md:pb-0">
         <Hero />
         <About />
         <Skills />
