@@ -91,6 +91,33 @@ export type Database = {
           },
         ]
       }
+      page_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          label: string | null
+          metadata: Json | null
+          path: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          label?: string | null
+          metadata?: Json | null
+          path?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          label?: string | null
+          metadata?: Json | null
+          path?: string | null
+        }
+        Relationships: []
+      }
       portfolio_items: {
         Row: {
           category: string | null

@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "@tanstack/react-router";
-import { Loader2, LogOut, Send, MessageSquare, Mail, ShieldAlert, RefreshCw, Search, Archive, ArchiveRestore, Filter, Briefcase, GraduationCap, Link as LinkIcon } from "lucide-react";
+import { Loader2, LogOut, Send, MessageSquare, Mail, ShieldAlert, RefreshCw, Search, Archive, ArchiveRestore, Filter, Briefcase, GraduationCap, Link as LinkIcon, BarChart3 } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -284,6 +284,9 @@ function Inbox() {
           </Link>
           <Link to="/admin/links" className="rounded-lg glass px-3 py-1.5 text-xs inline-flex items-center gap-1.5 hover:border-primary/40 transition">
             <LinkIcon className="h-3.5 w-3.5" /> الروابط
+          </Link>
+          <Link to="/admin/analytics" className="rounded-lg glass px-3 py-1.5 text-xs inline-flex items-center gap-1.5 hover:border-primary/40 transition">
+            <BarChart3 className="h-3.5 w-3.5" /> التحليلات
           </Link>
           <button onClick={loadConvos} className="rounded-lg glass px-3 py-1.5 text-xs inline-flex items-center gap-1.5">
             <RefreshCw className="h-3.5 w-3.5" /> تحديث
