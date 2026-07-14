@@ -131,38 +131,55 @@ function smoothScrollTo(id: string) {
 }
 
 function Nav() {
+  const [open, setOpen] = useState(false);
   const links = [
     { id: "about", label: "من أنا" },
-    { id: "skills", label: "المهارات" },
     { id: "services", label: "الخدمات" },
     { id: "portfolio", label: "أعمالي" },
     { id: "qualifications", label: "شهاداتي" },
     { id: "testimonials", label: "العملاء" },
-    { id: "faq", label: "أسئلة" },
     { id: "contact", label: "تواصل" },
   ];
+  const go = (id: string) => { setOpen(false); smoothScrollTo(id); };
   return (
     <header className="fixed top-0 inset-x-0 z-50">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 mt-4">
-        <nav className="glass-strong rounded-2xl px-5 py-3 flex items-center justify-between">
+      <div className="mx-auto max-w-7xl px-3 sm:px-6 mt-3 sm:mt-4">
+        <nav className="glass-strong rounded-2xl px-4 py-2.5 sm:px-5 sm:py-3 flex items-center justify-between">
           <button onClick={() => smoothScrollTo("top")} className="flex items-center gap-2 font-display text-lg">
             <span className="h-8 w-8 rounded-lg bg-[image:var(--gradient-cyan)] grid place-items-center text-background font-bold">خ</span>
             <span className="hidden sm:inline">خالد الشريف</span>
           </button>
           <div className="hidden md:flex items-center gap-6 text-sm text-muted-foreground">
             {links.map(l => (
-              <button key={l.id} onClick={() => smoothScrollTo(l.id)} className="hover:text-primary transition-colors">{l.label}</button>
+              <button key={l.id} onClick={() => go(l.id)} className="hover:text-primary transition-colors">{l.label}</button>
             ))}
           </div>
           <div className="flex items-center gap-2">
             <a href="/admin" aria-label="حسابي" title="تسجيل الدخول / حسابي" className="h-9 w-9 grid place-items-center rounded-lg glass hover:text-primary hover:border-primary/40 transition">
               <Briefcase className="h-4 w-4" />
             </a>
-            <button onClick={() => smoothScrollTo("contact")} className="rounded-xl bg-primary text-primary-foreground px-4 py-2 text-sm font-bold hover:opacity-90 transition">
+            <button onClick={() => smoothScrollTo("contact")} className="hidden sm:inline-flex rounded-xl bg-primary text-primary-foreground px-4 py-2 text-sm font-bold hover:opacity-90 transition">
               تواصل معي
+            </button>
+            <button onClick={() => setOpen(o => !o)} aria-label="القائمة" className="md:hidden h-9 w-9 grid place-items-center rounded-lg glass hover:text-primary hover:border-primary/40 transition">
+              <ChevronDown className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`} />
             </button>
           </div>
         </nav>
+        <AnimatePresence>
+          {open && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
+              className="md:hidden glass-strong rounded-2xl mt-2 p-2 grid grid-cols-2 gap-1"
+            >
+              {links.map(l => (
+                <button key={l.id} onClick={() => go(l.id)} className="text-right rounded-xl px-3 py-2.5 text-sm hover:bg-primary/10 hover:text-primary transition">
+                  {l.label}
+                </button>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </header>
   );
@@ -1071,7 +1088,7 @@ function Index() {
     <div className="min-h-screen relative">
       <AnimatedBackground />
       <Nav />
-      <main>
+      <main className="pb-24 md:pb-0">
         <Hero />
         <About />
         <Skills />

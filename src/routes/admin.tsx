@@ -96,27 +96,31 @@ function LoginCard() {
   }
 
   return (
-    <div className="min-h-screen grid place-items-center px-4">
+    <div className="min-h-screen grid place-items-center px-4 py-16">
       <div className="glass-strong rounded-3xl p-8 max-w-md w-full">
         <div className="text-center mb-6">
-          <div className="font-display text-2xl">لوحة التحكم</div>
-          <div className="text-xs text-muted-foreground mt-1">دخول المهندس خالد فقط</div>
+          <div className="mx-auto h-12 w-12 rounded-2xl grid place-items-center text-background mb-3" style={{ background: "var(--gradient-cyan)" }}>
+            <MessageSquare className="h-6 w-6" />
+          </div>
+          <div className="font-display text-2xl">{mode === "login" ? "تسجيل الدخول" : "إنشاء حساب"}</div>
+          <div className="text-xs text-muted-foreground mt-1">لوحة تحكم المهندس خالد الشريف</div>
         </div>
         <form onSubmit={submit} className="space-y-3">
           <input type="email" required placeholder="البريد الإلكتروني" value={email} onChange={e => setEmail(e.target.value)}
-            className="w-full bg-input border border-border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-primary" />
-          <input type="password" required minLength={6} placeholder="كلمة المرور" value={password} onChange={e => setPassword(e.target.value)}
-            className="w-full bg-input border border-border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-primary" />
+            className="w-full bg-input border border-border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-primary" dir="ltr" />
+          <input type="password" required minLength={6} placeholder="كلمة المرور (6 أحرف على الأقل)" value={password} onChange={e => setPassword(e.target.value)}
+            className="w-full bg-input border border-border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-primary" dir="ltr" />
           {err && <div className="text-xs text-destructive">{err}</div>}
           <button type="submit" disabled={busy}
             className="w-full rounded-xl text-background py-2.5 font-bold disabled:opacity-50 hover:scale-[1.02] active:scale-95 transition"
             style={{ background: "var(--gradient-cyan)" }}>
-            {busy ? "..." : mode === "login" ? "تسجيل الدخول" : "إنشاء حساب"}
+            {busy ? "..." : mode === "login" ? "دخول" : "إنشاء الحساب"}
           </button>
         </form>
-        <button onClick={() => setMode(m => m === "login" ? "signup" : "login")} className="text-xs text-primary mt-4 w-full text-center">
-          {mode === "login" ? "إنشاء حساب جديد" : "لدي حساب — تسجيل الدخول"}
+        <button onClick={() => setMode(m => m === "login" ? "signup" : "login")} className="text-xs text-primary mt-4 w-full text-center hover:underline">
+          {mode === "login" ? "ليس لديك حساب؟ أنشئ حساباً جديداً" : "لدي حساب بالفعل — تسجيل الدخول"}
         </button>
+        <Link to="/" className="text-[11px] text-muted-foreground mt-3 w-full text-center block hover:text-primary">← العودة إلى الموقع</Link>
       </div>
     </div>
   );
